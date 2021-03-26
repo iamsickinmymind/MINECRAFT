@@ -45,8 +45,8 @@ AMCWorldChunk::AMCWorldChunk()
 		}
 	}
 
-	Area = 16;
-	Depth = 2;
+	Area = 4;
+	Depth = 3;
 	VoxelSize = 100;
 	NoiseDensity = 0.001;
 	NoiseScale = 5;
@@ -55,10 +55,11 @@ AMCWorldChunk::AMCWorldChunk()
 	SnowTreshold = 600;
 	GrassTreshold = 350;
 
+	// TODO: Remove from constructor and use only manually - BeginPlay?
 	//SpawnWorldChunk();
 }
 
-void AMCWorldChunk::SpawnWorldChunk(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 NewDepth, int32 NewVoxelSize, float NewNoiseDensity, int32 NewNoiseScale, float New3DNoiseDensity, float New3DNoiseCutOff)
+void AMCWorldChunk::Init(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 NewDepth, int32 NewVoxelSize, float NewNoiseDensity, int32 NewNoiseScale, float New3DNoiseDensity, float New3DNoiseCutOff)
 {
 	BoxMesh = NewBoxMesh;
 	Area = NewArea;
@@ -69,16 +70,22 @@ void AMCWorldChunk::SpawnWorldChunk(class UStaticMesh* NewBoxMesh, int32 NewArea
 	_3DNoiseDensity = New3DNoiseDensity;
 	_3DNoiseCutOff = New3DNoiseCutOff;
 
+	//SpawnWorldChunk();
+}
+
+void AMCWorldChunk::BeginPlay()
+{
+	Super::BeginPlay();
+	
 	SpawnWorldChunk();
 }
 
 void AMCWorldChunk::SpawnWorldChunk()
 {
-
 	// TODO: How can I optimize this part?
 	for (int32 i = (Area * (-1)); i < Area; i++)
 	{
-		float RandomSeed = FMath::RandRange(0.0001f, 0.02f);
+		float RandomSeed = 0.f; //FMath::RandRange(0.0001f, 0.02f);
 
 		LocalVoxelPos_X = i;
 

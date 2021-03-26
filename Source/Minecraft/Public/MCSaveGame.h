@@ -14,14 +14,21 @@ class MINECRAFT_API UMCSaveGame : public USaveGame
 {
 	GENERATED_BODY()
 
+	UMCSaveGame();
+
 public:
 
-	void SetSaveData();
+	// TODO: Replace with & to save transports (or is it dangerous for SaveGame?)
+	void SetSaveData(TArray<class AMCWorldChunk*> &SpawnedChunksToSave, TArray<FIntVector> &SpawnCoordsToSave, TArray<FVector> &SpawnLocationsToSave);
 
-	void GetSaveData();
+	void GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad);
 
 private:
 
 	TArray<class AMCWorldChunk*> SpawnedChunksRefs;
-	TArray<FIntVector> SpawnedChunksCoords;	
+	TArray<FIntVector> SpawnedChunksCoords;
+	TArray<FVector> SpawnedChunksLocations;
+
+	FString SaveSlotName;
+	FString PlayerName;
 };

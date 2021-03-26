@@ -17,10 +17,12 @@ public:
 
 	//void InitializeWorldChunk(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 NewDepth, int32 NewVoxelSize, float NewNoiseDensity, int32 NewNoiseScale, float New3DNoiseDensity, float New3DNoiseCutOff);
 
-	void SpawnWorldChunk(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 NewDepth, int32 NewVoxelSize, float NewNoiseDensity, int32 NewNoiseScale, float New3DNoiseDensity, float New3DNoiseCutOff);
+	void Init(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 NewDepth, int32 NewVoxelSize, float NewNoiseDensity, int32 NewNoiseScale, float New3DNoiseDensity, float New3DNoiseCutOff);
 
 
 protected:
+
+	virtual void BeginPlay() override;
 
 	void SpawnWorldChunk();
 
@@ -38,32 +40,32 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	TMap<int32, class UMaterialInstance*> MaterialsMapping;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Dimensions", meta=(DisplayName="Area(2n-1)", ClampMin = 0, UIMin = 0, ExposeOnSpawn="true"))
-	int32 Area = 16;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Dimensions", meta=(DisplayName="Area(2n-1)", ClampMin = 0, UIMin = 0, ExposeOnSpawn="true"))
+	int32 Area;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Dimensions", meta=(DisplayName="Depth2n-1", ClampMin = 0, UIMin = 0, ExposeOnSpawn = "true"))
-	int32 Depth = 3;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings|Dimensions", meta=(DisplayName="Depth(2n-1)", ClampMin = 0, UIMin = 0, ExposeOnSpawn = "true"))
+	int32 Depth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Dimensions", meta = (ClampMin=0, UIMin=0, ExposeOnSpawn = "true"))
-	int32 VoxelSize = 100;
+	int32 VoxelSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0, ExposeOnSpawn = "true"))
-	float NoiseDensity = 0.00055;
+	float NoiseDensity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0, ExposeOnSpawn = "true"))
-	int32 NoiseScale = 6;
+	int32 NoiseScale;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0, ExposeOnSpawn = "true", DisplayName="3D Noise Density"))
-	float _3DNoiseDensity = 0.01;
+	float _3DNoiseDensity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0, ExposeOnSpawn = "true", DisplayName="3D CutOff Noise Treshold"))
-	float _3DNoiseCutOff = 0.f;
+	float _3DNoiseCutOff;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0))
-	float SnowTreshold = 600;
+	float SnowTreshold;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0))
-	float GrassTreshold = 350;
+	float GrassTreshold;
 
 	int32 LocalVoxelPos_X;
 	int32 LocalVoxelPos_Y;

@@ -101,6 +101,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "World Chunk")
 	void PlayerMoved();
 
+	UFUNCTION(BlueprintCallable, Category = "SaveLoadGame")
+	void SaveGame();
+
 #pragma endregion PROTECTED_FUNCTIONS
 
 #pragma region PROTECTED_VARIABLES

@@ -5,14 +5,15 @@
 #include "UObject/ConstructorHelpers.h"
 #include <Engine/StaticMesh.h>
 #include "MCWorldChunk.h"
+#include <MCSaveGame.h>
 
 AMCPlayerController::AMCPlayerController()
 {
-	ChunksSize = 3300.f;
+	ChunksSize = 825.f;
 	LastKnownPlayerChunkCoord = FVector2D(0, 0);
 	RenderRange = 3;
 	ChunkDepth = 1;
-	ChunkArea = 16;
+	ChunkArea = 4;
 	VoxelSize = 100;
 	NoiseDensity = 0.00055;
 	NoiseScale = 4;
@@ -52,6 +53,15 @@ void AMCPlayerController::PlayerMoved()
 	DestroyChunks();
 
 	SpawnChunks();
+}
+
+void AMCPlayerController::SaveGame()
+{
+	UMCSaveGame* NewSaveGame = NewObject<UMCSaveGame>();
+	if (NewSaveGame)
+	{
+		NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations);
+	}
 }
 
 FVector2D AMCPlayerController::GetPlayerChunk() const
@@ -103,7 +113,8 @@ void AMCPlayerController::SpawnChunks()
 					FVector TempLoc = FVector((GetPlayerChunk().X + TempX) * ChunksSize, (GetPlayerChunk().Y + TempY) * ChunksSize, 0);
 					SpawnedChunksLocations.Add(TempLoc);
 
-					/*
+					// TODO: Remove from iterations and spawn after iterations to iterate as fast as possible
+					
 					FRotator TempRot;
 					FActorSpawnParameters TempParams;
 					TempParams.bNoFail = true;
@@ -119,10 +130,9 @@ void AMCPlayerController::SpawnChunks()
 
 							// TODO: Here I wanted to create some Init functions to pass variables
 							// NewChunk->InitializeWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
-							NewChunk->SpawnWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
+							NewChunk->Init(ChunkMesh, ChunkArea, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
 						}
 					}
-					*/
 				}
 			}
 		}
@@ -131,9 +141,11 @@ void AMCPlayerController::SpawnChunks()
 
 	UE_LOG(LogTemp, Error, TEXT("Finished calculating spawn locations"))
 
+	
 	/************************************************************************/
 	/*                      SPAWN CHUNKS ON LOCATIONS                       */
 	/************************************************************************/
+	/*
 	if (GetWorld())
 	{
 		for (auto ItrLoc : SpawnedChunksLocations)
@@ -152,12 +164,14 @@ void AMCPlayerController::SpawnChunks()
 					SpawnedChunksCoords.Add(ChunkCoords);
 
 					// TODO: Here I wanted to create some Init functions to pass variables
+					// This will cause issues for loading, too.
 					// NewChunk->InitializeWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
-					NewChunk->SpawnWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
+					NewChunk->Init(ChunkMesh, ChunkArea, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
 				}
 			}
 		}
 	}
+	*/
 }
 
 void AMCPlayerController::DestroyChunks()
