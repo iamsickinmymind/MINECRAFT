@@ -93,9 +93,7 @@ void AMCPlayerController::SpawnChunks()
 
 			int32 TempY = AreaY;
 
-			/************************************************************************/
-			/*                      SPAWN CHUNKS ON LOCATIONS                       */
-			/************************************************************************/
+			
 			ChunkCoords = FIntVector(GetPlayerChunk().X + TempX, GetPlayerChunk().Y + TempY, 0);
 
 			if ( (FVector(TempX * ChunksSize, TempY * ChunksSize, 0).Size() <= (RenderRange * ChunksSize)) && !(SpawnedChunksCoords.Contains(ChunkCoords))) //<----------- this one gave me nightmares; check whether epected spawnpoint is within render range && this index is not already occupied by any other chunk
@@ -103,6 +101,9 @@ void AMCPlayerController::SpawnChunks()
 				if(GetWorld())
 				{
 					FVector TempLoc = FVector((GetPlayerChunk().X + TempX) * ChunksSize, (GetPlayerChunk().Y + TempY) * ChunksSize, 0);
+					SpawnedChunksLocations.Add(TempLoc);
+
+					/*
 					FRotator TempRot;
 					FActorSpawnParameters TempParams;
 					TempParams.bNoFail = true;
@@ -118,13 +119,44 @@ void AMCPlayerController::SpawnChunks()
 
 							// TODO: Here I wanted to create some Init functions to pass variables
 							// NewChunk->InitializeWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
-							// NewChunk->SpawnWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
+							NewChunk->SpawnWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
 						}
 					}
+					*/
 				}
 			}
 		}
 
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("Finished calculating spawn locations"))
+
+	/************************************************************************/
+	/*                      SPAWN CHUNKS ON LOCATIONS                       */
+	/************************************************************************/
+	if (GetWorld())
+	{
+		for (auto ItrLoc : SpawnedChunksLocations)
+		{
+			FRotator TempRot;
+			FActorSpawnParameters TempParams;
+			TempParams.bNoFail = true;
+			TempParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
+
+			AActor* TempChunk = GetWorld()->SpawnActor<AActor>(WorldChunkClass, ItrLoc, TempRot, TempParams);
+			if (TempChunk)
+			{
+				if (AMCWorldChunk* NewChunk = Cast<AMCWorldChunk>(TempChunk))
+				{
+					SpawnedChunksRefs.Add(NewChunk);
+					SpawnedChunksCoords.Add(ChunkCoords);
+
+					// TODO: Here I wanted to create some Init functions to pass variables
+					// NewChunk->InitializeWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
+					NewChunk->SpawnWorldChunk(ChunkMesh, ChunksSize, ChunkDepth, VoxelSize, NoiseDensity, NoiseScale, _3DNoiseDensity, _3DNoiseCutoff);
+				}
+			}
+		}
 	}
 }
 

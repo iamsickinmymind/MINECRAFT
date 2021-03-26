@@ -108,6 +108,7 @@ protected:
 	//TODO: Maybe use FMap where FIntVector is a key.
 	TArray<class AMCWorldChunk*> SpawnedChunksRefs;
 	TArray<FIntVector> SpawnedChunksCoords;
+	TArray<FVector> SpawnedChunksLocations;
 	FIntVector ChunkCoords;
 
 #pragma endregion PROTECTED_VARIABLES
