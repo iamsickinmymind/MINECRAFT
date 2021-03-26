@@ -45,14 +45,14 @@ AMCWorldChunk::AMCWorldChunk()
 		}
 	}
 
-	Area = 4;
+	Area = 5;
 	Depth = 3;
 	VoxelSize = 100;
 	NoiseDensity = 0.001;
 	NoiseScale = 5;
 	_3DNoiseDensity = 0.01;
 	_3DNoiseCutOff = 0.f;
-	SnowTreshold = 600;
+	SnowTreshold = 500;
 	GrassTreshold = 350;
 
 	// TODO: Remove from constructor and use only manually - BeginPlay?

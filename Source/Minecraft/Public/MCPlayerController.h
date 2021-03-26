@@ -15,6 +15,8 @@ class MINECRAFT_API AMCPlayerController : public APlayerController
 	GENERATED_BODY()
 
 	AMCPlayerController();
+
+	friend class AMinecraftCharacter;
 	
 public:
 
@@ -101,8 +103,17 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "World Chunk")
 	void PlayerMoved();
 
+	UFUNCTION()
+	void EscapePressed();
+
+	UFUNCTION(BlueprintCallable, Category = "User Interface")
+	void ExitGame();
+
 	UFUNCTION(BlueprintCallable, Category = "SaveLoadGame")
-	void SaveGame();
+	bool SaveGame();
+
+	UFUNCTION(BlueprintCallable, Category = "User Interface")
+	void RemoveHUD();
 
 #pragma endregion PROTECTED_FUNCTIONS
 
@@ -113,6 +124,11 @@ protected:
 	TArray<FIntVector> SpawnedChunksCoords;
 	TArray<FVector> SpawnedChunksLocations;
 	FIntVector ChunkCoords;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HUD")
+	TSubclassOf<class UUserWidget> MainMenuClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
+	class UUserWidget* MainMenu = nullptr;
 
 #pragma endregion PROTECTED_VARIABLES
 };

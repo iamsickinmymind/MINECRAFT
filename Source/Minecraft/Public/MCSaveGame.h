@@ -19,15 +19,16 @@ class MINECRAFT_API UMCSaveGame : public USaveGame
 public:
 
 	// TODO: Replace with & to save transports (or is it dangerous for SaveGame?)
-	void SetSaveData(TArray<class AMCWorldChunk*> &SpawnedChunksToSave, TArray<FIntVector> &SpawnCoordsToSave, TArray<FVector> &SpawnLocationsToSave);
+	bool SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave);
 
-	void GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad);
+	void GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition);
 
 private:
 
 	TArray<class AMCWorldChunk*> SpawnedChunksRefs;
 	TArray<FIntVector> SpawnedChunksCoords;
 	TArray<FVector> SpawnedChunksLocations;
+	FVector PlayerPosition;
 
 	FString SaveSlotName;
 	FString PlayerName;

@@ -29,3 +29,8 @@ void AMCPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
+
+void AMCPlayer::EscapePressed()
+{
+
+}

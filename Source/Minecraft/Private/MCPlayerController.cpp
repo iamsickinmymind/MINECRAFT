@@ -6,14 +6,15 @@
 #include <Engine/StaticMesh.h>
 #include "MCWorldChunk.h"
 #include <MCSaveGame.h>
+#include <Blueprint/UserWidget.h>
 
 AMCPlayerController::AMCPlayerController()
 {
-	ChunksSize = 825.f;
+	ChunksSize = 1200.f;
 	LastKnownPlayerChunkCoord = FVector2D(0, 0);
 	RenderRange = 3;
 	ChunkDepth = 1;
-	ChunkArea = 4;
+	ChunkArea = 5;
 	VoxelSize = 100;
 	NoiseDensity = 0.00055;
 	NoiseScale = 4;
@@ -55,13 +56,70 @@ void AMCPlayerController::PlayerMoved()
 	SpawnChunks();
 }
 
-void AMCPlayerController::SaveGame()
+void AMCPlayerController::EscapePressed()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ESCAPE PRESSED - CONTROLLER"))
+
+	if (MainMenu)
+	{
+		RemoveHUD();
+		return;
+	}
+
+	if (MainMenuClass)
+	{
+		MainMenu = CreateWidget<UUserWidget>(this, MainMenuClass);
+		if (MainMenu)
+		{
+			MainMenu->bIsFocusable = true;
+			MainMenu->SetFocus();
+
+			bShowMouseCursor = true;
+			
+			MainMenu->AddToViewport(0);
+			FInputModeUIOnly NewInputMode;
+
+			SetInputMode(NewInputMode);
+		}
+		else
+		{
+			
+		}
+	}
+}
+
+void AMCPlayerController::ExitGame()
+{
+	if (SaveGame())
+	{
+		FGenericPlatformMisc::RequestExitWithStatus(false, 0);
+	}
+}
+
+bool AMCPlayerController::SaveGame()
+{
+	if (!GetPawn())
+	{
+		return false;
+	}
 	UMCSaveGame* NewSaveGame = NewObject<UMCSaveGame>();
 	if (NewSaveGame)
 	{
-		NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations);
+		return NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, GetPawn()->GetActorLocation());
 	}
+
+	return false;
+}
+
+void AMCPlayerController::RemoveHUD()
+{
+	MainMenu->RemoveFromParent();
+	MainMenu = nullptr;
+	FInputModeGameOnly NewInputMode;
+
+	bShowMouseCursor = false;
+
+	SetInputMode(NewInputMode);
 }
 
 FVector2D AMCPlayerController::GetPlayerChunk() const
@@ -115,7 +173,7 @@ void AMCPlayerController::SpawnChunks()
 
 					// TODO: Remove from iterations and spawn after iterations to iterate as fast as possible
 					
-					FRotator TempRot;
+					FRotator TempRot = FRotator(0);
 					FActorSpawnParameters TempParams;
 					TempParams.bNoFail = true;
 					TempParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
@@ -146,6 +204,7 @@ void AMCPlayerController::SpawnChunks()
 	/*                      SPAWN CHUNKS ON LOCATIONS                       */
 	/************************************************************************/
 	/*
+	/* This idea wont work because of SpawnedChunksCoords.
 	if (GetWorld())
 	{
 		for (auto ItrLoc : SpawnedChunksLocations)
@@ -194,4 +253,6 @@ void AMCPlayerController::DestroyChunks()
 			}
 		}
 	}
+
+	
 }

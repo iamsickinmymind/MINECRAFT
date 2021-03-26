@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/InputSettings.h"
+#include <MCPlayerController.h>
 //#include "Kismet/GameplayStatics.h"
 
 
@@ -59,6 +60,18 @@ void AMinecraftCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAxis("TurnRate", this, &AMinecraftCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AMinecraftCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &AMinecraftCharacter::EscapePressed);
+}
+
+void AMinecraftCharacter::EscapePressed()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ESCAPE PRESSED - PLAYER"))
+
+	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
+	{
+		PlayerCon->EscapePressed();
+	}
 }
 
 void AMinecraftCharacter::MoveForward(float Value)
