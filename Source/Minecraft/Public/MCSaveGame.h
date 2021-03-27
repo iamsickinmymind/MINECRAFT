@@ -23,13 +23,21 @@ public:
 
 	bool GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition);
 
-private:
+	UFUNCTION(BlueprintCallable, Category = "TEST")
+	FORCEINLINE bool CallFromBP() { return true; };
 
+private:
+	UPROPERTY(SaveGame)
 	TArray<class AMCWorldChunk*> SpawnedChunksRefs;
+
+	UPROPERTY(SaveGame)
 	TArray<FIntVector> SpawnedChunksCoords;
+
+	UPROPERTY(SaveGame)
 	TArray<FVector> SpawnedChunksLocations;
+
+	UPROPERTY(SaveGame)
 	FVector PlayerPosition;
 
 	FString SaveSlotName;
-	FString PlayerName;
 };

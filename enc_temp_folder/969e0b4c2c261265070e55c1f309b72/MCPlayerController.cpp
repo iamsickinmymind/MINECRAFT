@@ -118,12 +118,9 @@ bool AMCPlayerController::LoadGame()
 	{
 		FVector NewPlayerPosition(0);
 
-		if( NewLoadGame->GetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, NewPlayerPosition))
-		{
-			// TODO: reload the world here
+		UE_LOG(LogTemp, Warning, TEXT("LoadingVector: %s"), *NewPlayerPosition.ToString())
 
-			return true;
-		}
+		return NewLoadGame->GetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, NewPlayerPosition);
 	}
 	
 	return false;
