@@ -189,7 +189,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="Player|Interaction", meta=(UIMin = 0, ClampMin=0))
 	float Range;
 
-	/** How fast the digging can be. Digs per second.*/
+	/** How many seconds is interval between individual digs*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Interaction", meta = (UIMin = 0, ClampMin = 0))
 	float DPS;
 	float LastDigTime;
@@ -201,6 +201,10 @@ protected:
 	TWeakObjectPtr<class UPhysicalMaterial> LastHitPhysMat = nullptr;
 	FBox LastHitBox;
 	int32 HitCounter;
+	int32 LastHitInstanceIndex;
+
+	TArray<FVector> DeletedCubesLocations;
+	TArray<FVector> PlayerSpawnedCubesLocations;
 
 #pragma endregion PROTECTED_VARIABLES
 };

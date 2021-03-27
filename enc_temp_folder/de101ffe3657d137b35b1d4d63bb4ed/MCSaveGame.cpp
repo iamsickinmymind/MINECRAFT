@@ -71,6 +71,11 @@ bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TA
 
 			SpawnDeletedBlocksLocations = LoadGameInstance->DeletedBlocksLocations;
 
+			for (auto Itr : SpawnDeletedBlocksLocations)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Loaded FVector: %s"), *Itr.ToString())
+			}
+
 			return true;
 		}
 	}

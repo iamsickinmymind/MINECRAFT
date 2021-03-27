@@ -29,6 +29,7 @@ AMCPlayerController::AMCPlayerController()
 	LastDigTime = 0;
 	LastHitBox = FBox(FVector::ZeroVector, FVector::ZeroVector);
 	HitCounter = 0;
+	LastHitInstanceIndex = 0;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshFinder(TEXT("/Game/0_MC/Mesh/SM_MCCube"));
 	ChunkMesh = StaticMeshFinder.Object ? StaticMeshFinder.Object : nullptr;
@@ -115,11 +116,19 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 
 						auto HitMaterial = HitResult.PhysMaterial;
 						
-						if (LastHitPhysMat == nullptr || ((LastHitPhysMat->GetName() == HitMaterial->GetName()) && (HitBox == LastHitBox)))
+						if
+						(
+							LastHitPhysMat == nullptr || // <------ for the first hit the LastHitPhysMat is not defined
+							((LastHitPhysMat->GetName() == HitMaterial->GetName()) && (LastHitInstanceIndex == HitCubes[0])) || // <------ compare LastHitPhysMat AND indexes
+							((LastHitPhysMat->GetName() == HitMaterial->GetName()) && (HitBox == LastHitBox)) // <-------- compare HitBoxes
+						)
 						{
+							LastHitInstanceIndex = HitCubes[0];
 							HitCounter++;
 							LastHitPhysMat = HitMaterial;
 							// No need to update LastHitBox because for it is roughly the same
+
+							UE_LOG(LogTemp, Warning, TEXT("HitCounter: %d for %s"), HitCounter, *HitMaterial->GetName())
 
 							// TODO
 							// Replace LastHitBox with hitInstanceIndex
@@ -130,10 +139,19 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 								{
 									HitComp->RemoveInstance(HitCubes[0]);
 
+									FTransform DeletingInstanceTransform;
+									HitComp->GetInstanceTransform(HitCubes[0], DeletingInstanceTransform);
+
+									// adding location of deleted block to array of all deleted blocks
+									DeletedCubesLocations.Add(DeletingInstanceTransform.GetLocation());
+
 									// Delete values because cube was hit for its last time
 									LastHitPhysMat = nullptr;
 									LastHitBox = FBox();
 									HitCounter = 0;
+
+									// Save game after deleting a cube.
+									SaveGame();
 
 									// This may delete multiple cubes if hit on edge. Precision not guaranteed therefore avoided
 									/*
@@ -228,7 +246,7 @@ bool AMCPlayerController::SaveGame()
 	UMCSaveGame* NewSaveGame = NewObject<UMCSaveGame>();
 	if (NewSaveGame)
 	{
-		return NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, GetPawn()->GetActorLocation(), LastKnownPlayerChunkCoord);
+		return NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, GetPawn()->GetActorLocation(), LastKnownPlayerChunkCoord, DeletedCubesLocations);
 	}
 
 	return false;
@@ -253,8 +271,9 @@ bool AMCPlayerController::LoadGame()
 		TArray<FIntVector> TempSpawnedChunksCoords;
 		TArray<FVector> TmpSpawnedChunksLocations;
 		FVector2D TempLastKnownPlayerChunkCoord;
+		TArray<FVector> TempDeletedBlocksLocations;
 
-		if( NewLoadGame->GetSaveData(TempSpawnedChunksRefs, TempSpawnedChunksCoords, TmpSpawnedChunksLocations, NewPlayerPosition, TempLastKnownPlayerChunkCoord))
+		if( NewLoadGame->GetSaveData(TempSpawnedChunksRefs, TempSpawnedChunksCoords, TmpSpawnedChunksLocations, NewPlayerPosition, TempLastKnownPlayerChunkCoord, TempDeletedBlocksLocations))
 		{
 			// TODO: reload the world here
 
@@ -271,10 +290,12 @@ bool AMCPlayerController::LoadGame()
 			SpawnedChunksRefs.Empty();
 			SpawnedChunksCoords.Empty();
 			SpawnedChunksLocations.Empty();
+			DeletedCubesLocations.Empty();
 
 			SpawnedChunksRefs = TempSpawnedChunksRefs;
 			SpawnedChunksCoords = TempSpawnedChunksCoords;
 			SpawnedChunksLocations = TmpSpawnedChunksLocations;
+			DeletedCubesLocations = TempDeletedBlocksLocations;
 
 			for (int32 i = 0; i < SpawnedChunksRefs.Num(); i++)
 			{
@@ -284,11 +305,6 @@ bool AMCPlayerController::LoadGame()
 					FActorSpawnParameters ChunkSpawnParams;
 					ChunkSpawnParams.Owner = this;
 					AMCWorldChunk* LoadedChunk = GetWorld()->SpawnActor<AMCWorldChunk>(WorldChunkClass, SpawnedChunksLocations[i], TempRot, ChunkSpawnParams);
-					if (LoadedChunk)
-					{
-						// use PostSpawnInitialize to setup all variables?
-						// LoadedChunk->PostSpawnInitialize() // <---- not like this :)
-					}
 				}
 			}
 
