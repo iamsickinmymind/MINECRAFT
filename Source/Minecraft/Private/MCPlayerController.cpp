@@ -101,7 +101,7 @@ bool AMCPlayerController::SaveGame()
 	UMCSaveGame* NewSaveGame = NewObject<UMCSaveGame>();
 	if (NewSaveGame)
 	{
-		return NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, GetPawn()->GetActorLocation());
+		return NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, GetPawn()->GetActorLocation(), LastKnownPlayerChunkCoord);
 	}
 
 	return false;
@@ -118,9 +118,43 @@ bool AMCPlayerController::LoadGame()
 	{
 		FVector NewPlayerPosition(0);
 
-		if( NewLoadGame->GetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, NewPlayerPosition))
+		TArray<class AMCWorldChunk*> TempSpawnedChunksRefs;
+		TArray<FIntVector> TempSpawnedChunksCoords;
+		TArray<FVector> TmpSpawnedChunksLocations;
+		FVector2D TempLastKnownPlayerChunkCoord;
+
+		if( NewLoadGame->GetSaveData(TempSpawnedChunksRefs, TempSpawnedChunksCoords, TmpSpawnedChunksLocations, NewPlayerPosition, TempLastKnownPlayerChunkCoord))
 		{
 			// TODO: reload the world here
+
+			// Destroy all current chunks
+			for (auto Itr : SpawnedChunksRefs)
+			{
+				if (Itr == Cast<AMCWorldChunk>(Itr))
+				{
+					Itr->Destroy();
+				}
+			}
+			// Clean arrays
+			SpawnedChunksRefs.Empty();
+			SpawnedChunksCoords.Empty();
+			SpawnedChunksLocations.Empty();
+
+			SpawnedChunksRefs = TempSpawnedChunksRefs;
+			SpawnedChunksCoords = TempSpawnedChunksCoords;
+			SpawnedChunksLocations = TmpSpawnedChunksLocations;
+
+			for (int32 i = 0; i < SpawnedChunksRefs.Num(); i++)
+			{
+				if (SpawnedChunksRefs[i])
+				{
+					FRotator TempRot(0);
+					GetWorld()->SpawnActor<AMCWorldChunk>(WorldChunkClass, SpawnedChunksLocations[i], TempRot);
+				}
+			}
+
+			// SetActorLocation must be the last thing to do
+			GetPawn()->SetActorLocation(NewPlayerPosition);
 
 			return true;
 		}
@@ -268,6 +302,7 @@ void AMCPlayerController::DestroyChunks()
 				SpawnedChunksRefs[i]->Destroy();
 				SpawnedChunksRefs.RemoveAt(i);
 				SpawnedChunksCoords.RemoveAt(i);
+				SpawnedChunksLocations.RemoveAt(i);
 			}
 		}
 	}

@@ -19,9 +19,9 @@ class MINECRAFT_API UMCSaveGame : public USaveGame
 public:
 
 	// TODO: Replace with & to save transports (or is it dangerous for SaveGame?)
-	bool SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave);
+	bool SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave, FVector2D LastKnownPlayerPosToSave);
 
-	bool GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition);
+	bool GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition, FVector2D &LastKnownPlayerPosToLoad);
 
 	UFUNCTION(BlueprintCallable, Category = "TEST")
 	FORCEINLINE bool CallFromBP() { return true; };
@@ -38,6 +38,9 @@ private:
 
 	UPROPERTY(SaveGame)
 	FVector PlayerPosition;
+
+	UPROPERTY(SaveGame)
+	FVector2D LastKnownPlayerPos;
 
 	FString SaveSlotName;
 };

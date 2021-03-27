@@ -10,7 +10,7 @@ UMCSaveGame::UMCSaveGame()
 }
 
 // TODO: FStruct SaveGameData
-bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave)
+bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave, FVector2D LastKnownPlayerPosToSave)
 {
 	if (UMCSaveGame* SaveGameInstance = Cast<UMCSaveGame>(UGameplayStatics::CreateSaveGameObject(UMCSaveGame::StaticClass())))
 	{
@@ -20,11 +20,13 @@ bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, 
 		SaveGameInstance->SpawnedChunksCoords.Empty();
 		SaveGameInstance->SpawnedChunksLocations.Empty();
 		SaveGameInstance->PlayerPosition = FVector(0);
+		SaveGameInstance->LastKnownPlayerPos = FVector2D(0);
 		
 		SaveGameInstance->SpawnedChunksRefs = SpawnedChunksToSave;
 		SaveGameInstance->SpawnedChunksCoords = SpawnCoordsToSave;
 		SaveGameInstance->SpawnedChunksLocations = SpawnLocationsToSave;
 		SaveGameInstance->PlayerPosition = PlayerPositionToSave;
+		SaveGameInstance->LastKnownPlayerPos = LastKnownPlayerPosToSave;
 
 		// Save the data immediately.
 		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveSlotName, 0))
@@ -40,7 +42,7 @@ bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, 
 	return false;
 }
 
-bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition)
+bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition, FVector2D &LastKnownPlayerPosToLoad)
 {
 	if (!(UGameplayStatics::DoesSaveGameExist(SaveSlotName, 0)))
 	{
@@ -62,6 +64,8 @@ bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TA
 			SpawnLocationsToLoad = LoadGameInstance->SpawnedChunksLocations;
 
 			SpawnPlayerPosition = LoadGameInstance->PlayerPosition;
+
+			LastKnownPlayerPosToLoad = LoadGameInstance->LastKnownPlayerPos;
 
 			return true;
 		}
