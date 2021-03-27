@@ -48,11 +48,6 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// TODO
-	// Check PlayerAction
-	// If Digging Raycast from ViewPoint and process FHitResult
-	// If Building Raycast from ViewPoint and process SpawnNewCube
-
 	// Check every tick whether player moved from hist last chunk.
 	// Smaller chunks = heavier impact on performance, smoother visibility & spawns
 

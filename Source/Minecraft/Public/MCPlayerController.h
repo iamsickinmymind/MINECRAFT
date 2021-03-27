@@ -6,6 +6,17 @@
 #include "GameFramework/PlayerController.h"
 #include "MCPlayerController.generated.h"
 
+UENUM(BlueprintType)
+enum class EPlayerAction : uint8
+{
+	EPA_Playing		UMETA(DisplayName = "Playing"),
+	EPA_Digging		UMETA(DisplayName = "Digging"),
+	EPA_Building	UMETA(DisplayName = "Building"),
+
+	EPA_default		 UMETA(Hidden)
+};
+
+
 /**
  * 
  */
@@ -83,6 +94,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "World Chunk")
 	void SetLastKnownChunkCoords(FVector2D NewCoords);
 
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category ="Player")
+	FORCEINLINE EPlayerAction GetPlayerAction() const
+	{
+		return PlayerAction;
+	}
+
+	void DigStarted();
+	void DigStopped();
+
+	void BuildingStarted();
+	void BuildingStopped();
+
 #pragma endregion PUBLIC_FUNCTIONS
 
 protected:
@@ -130,11 +153,18 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HUD")
 	TSubclassOf<class UUserWidget> MainMenuClass;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HUD")
+	TSubclassOf<class UUserWidget> DefaultWidgetClass;
+
 	class UUserWidget* MainMenu = nullptr;
+	class UUserWidget* DefaultWidget = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveLoad")
 	TSubclassOf<class USaveGame> SaveGameClass;
+
+	// Defines what action is player doing. This should be implemented in Player State tho
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player")
+	EPlayerAction PlayerAction;
 
 #pragma endregion PROTECTED_VARIABLES
 };

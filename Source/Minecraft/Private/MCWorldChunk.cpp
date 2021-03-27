@@ -5,6 +5,11 @@
 #include <Materials/MaterialInstance.h>
 #include <SimplexNoiseBPLibrary.h>
 
+#define Snow = SurfaceType1;
+#define Grass = SurfaceType2;
+#define Stone = SurfaceType3;
+#define Dirt = SurfaceType4;
+
 // Sets default values
 AMCWorldChunk::AMCWorldChunk()
 {
@@ -29,7 +34,9 @@ AMCWorldChunk::AMCWorldChunk()
 		UInstancedStaticMeshComponent* NewComp = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName(FString("instancedMesh").Append(FString::FormatAsNumber(i))));
 		if (NewComp)
 		{
-			NewComp->AttachTo(GetRootComponent());
+			//NewComp->AttachTo(GetRootComponent());
+			FAttachmentTransformRules SpawnTransRules = FAttachmentTransformRules::SnapToTargetIncludingScale;
+			NewComp->SetupAttachment(GetRootComponent());
 
 			InstancedBoxes.Add(NewComp);
 
@@ -71,6 +78,11 @@ void AMCWorldChunk::Init(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 New
 	_3DNoiseCutOff = New3DNoiseCutOff;
 
 	//SpawnWorldChunk();
+}
+
+void AMCWorldChunk::PostActorCreated()
+{
+	Super::PostActorCreated();
 }
 
 void AMCWorldChunk::BeginPlay()
@@ -142,7 +154,6 @@ void AMCWorldChunk::SpawnWorldChunk()
 
 bool AMCWorldChunk::Get3DNoiseZ(const float InNoiseCutof, const float InNoiseDensity)
 {
-
 	int RandomSeed = FMath::RandRange(-33, 26);
 
 	USimplexNoiseBPLibrary* SimplexLibrary = NewObject<USimplexNoiseBPLibrary>();

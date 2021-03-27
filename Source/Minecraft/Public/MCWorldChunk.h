@@ -19,6 +19,7 @@ public:
 
 	void Init(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 NewDepth, int32 NewVoxelSize, float NewNoiseDensity, int32 NewNoiseScale, float New3DNoiseDensity, float New3DNoiseCutOff);
 
+	void PostActorCreated() override;
 
 protected:
 

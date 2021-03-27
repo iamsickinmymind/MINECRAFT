@@ -6,6 +6,26 @@
 #include "GameFramework/SaveGame.h"
 #include "MCSaveGame.generated.h"
 
+USTRUCT(BlueprintType)
+struct FChunkData
+{
+	GENERATED_BODY()
+
+	FChunkData()
+	{
+		;
+	};
+
+	FChunkData(TArray<FVector> _DestroyedLocations)
+	{
+		DestroyedLocations = _DestroyedLocations;
+	};
+
+protected:
+
+	TArray<FVector> DestroyedLocations;
+};
+
 /**
  * 
  */

@@ -62,6 +62,10 @@ void AMinecraftCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AMinecraftCharacter::LookUpAtRate);
 
 	PlayerInputComponent->BindAction("Escape", IE_Pressed, this, &AMinecraftCharacter::EscapePressed);
+
+	PlayerInputComponent->BindAction("BuildingMode", IE_Pressed, this, &AMinecraftCharacter::BuildingRequest);
+	PlayerInputComponent->BindAction("DiggingMode", IE_Pressed, this, &AMinecraftCharacter::DigRequest);
+	PlayerInputComponent->BindAction("DiggingMode", IE_Released, this, &AMinecraftCharacter::DigRequest);
 }
 
 void AMinecraftCharacter::EscapePressed()
@@ -71,6 +75,22 @@ void AMinecraftCharacter::EscapePressed()
 	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
 	{
 		PlayerCon->EscapePressed();
+	}
+}
+
+void AMinecraftCharacter::DigRequest()
+{
+	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
+	{
+		PlayerCon->DigStarted();
+	}
+}
+
+void AMinecraftCharacter::BuildingRequest()
+{
+	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
+	{
+		PlayerCon->BuildingStarted();
 	}
 }
 

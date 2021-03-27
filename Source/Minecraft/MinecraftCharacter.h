@@ -56,6 +56,12 @@ protected:
 	UFUNCTION()
 	void EscapePressed();
 
+	UFUNCTION()
+	void DigRequest();
+
+	UFUNCTION()
+	void BuildingRequest();
+
 public:
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
