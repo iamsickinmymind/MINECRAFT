@@ -81,10 +81,6 @@ void AMCPlayerController::EscapePressed()
 
 			SetInputMode(NewInputMode);
 		}
-		else
-		{
-			
-		}
 	}
 }
 
@@ -108,6 +104,25 @@ bool AMCPlayerController::SaveGame()
 		return NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, GetPawn()->GetActorLocation());
 	}
 
+	return false;
+}
+
+bool AMCPlayerController::LoadGame()
+{
+	if (!GetPawn())
+	{
+		return false;
+	}
+	UMCSaveGame* NewLoadGame = NewObject<UMCSaveGame>();
+	if (NewLoadGame)
+	{
+		FVector NewPlayerPosition(0);
+
+		UE_LOG(LogTemp, Warning, TEXT("LoadingVector: %s"), *NewPlayerPosition.ToString())
+
+		return NewLoadGame->GetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, NewPlayerPosition);
+	}
+	
 	return false;
 }
 

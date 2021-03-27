@@ -6,7 +6,7 @@
 
 UMCSaveGame::UMCSaveGame()
 {
-	PlayerName = TEXT("MINECRAFT_PLAYER");
+	// PlayerName = TEXT("MINECRAFT_PLAYER");
 	SaveSlotName = TEXT("MINECRAFT_SAVE");
 }
 
@@ -16,7 +16,7 @@ bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, 
 	if (UMCSaveGame* SaveGameInstance = Cast<UMCSaveGame>(UGameplayStatics::CreateSaveGameObject(UMCSaveGame::StaticClass())))
 	{
 		// Set data on the savegame object.
-		SaveGameInstance->PlayerName = TEXT("MINECRAFT_PLAYER");
+		// SaveGameInstance->PlayerName = TEXT("MINECRAFT_PLAYER");
 
 		SaveGameInstance->SpawnedChunksRefs.Empty();
 		SaveGameInstance->SpawnedChunksCoords.Empty();
@@ -31,7 +31,6 @@ bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, 
 		// Save the data immediately.
 		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveSlotName, 0))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("SAVE OK"))
 			return true;
 		}
 		else
@@ -43,7 +42,33 @@ bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, 
 	return false;
 }
 
-void UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition)
+bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition)
 {
+	if (!(UGameplayStatics::DoesSaveGameExist(SaveSlotName, 0)))
+	{
+		UE_LOG(LogTemp, Error, TEXT("SaveGame Does Not Exist: %s"), *SaveSlotName)
+		return false;
+	}
+
+	if (UMCSaveGame* LoadGameInstance = Cast<UMCSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0)))
+	{
+		if (LoadGameInstance)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LoadingChunks: %d"), LoadGameInstance->SpawnedChunksRefs.Num())
+			UE_LOG(LogTemp, Warning, TEXT("LoadingRef: %d"), LoadGameInstance->SpawnedChunksCoords.Num())
+			UE_LOG(LogTemp, Warning, TEXT("LoadingLocations: %d"), LoadGameInstance->SpawnedChunksLocations.Num())
+			UE_LOG(LogTemp, Warning, TEXT("LoadedVector: %s"), *LoadGameInstance->PlayerPosition.ToString())
+			
+			WorlChunksToLoad = LoadGameInstance->SpawnedChunksRefs;
+			SpawnCoordsToLoad = LoadGameInstance->SpawnedChunksCoords;
+			SpawnLocationsToLoad = LoadGameInstance->SpawnedChunksLocations;
+			SpawnPlayerPosition = LoadGameInstance->PlayerPosition;
+
+			UE_LOG(LogTemp, Warning, TEXT("LoadedVector: %s"), *LoadGameInstance->PlayerPosition.ToString())
+
+			return true;
+		}
+	}
 		
+	return false;
 }

@@ -111,6 +111,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "SaveLoadGame")
 	bool SaveGame();
+	
+	UFUNCTION(BlueprintCallable, Category = "SaveLoadGame")
+	bool LoadGame();
 
 	UFUNCTION(BlueprintCallable, Category = "User Interface")
 	void RemoveHUD();
@@ -129,6 +132,9 @@ protected:
 	TSubclassOf<class UUserWidget> MainMenuClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
 	class UUserWidget* MainMenu = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveLoad")
+	TSubclassOf<class USaveGame> SaveGameClass;
 
 #pragma endregion PROTECTED_VARIABLES
 };
