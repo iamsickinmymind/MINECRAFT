@@ -11,6 +11,7 @@
 #ifdef WITH_EDITOR
 #include "DrawDebugHelpers.h"
 #endif WITH_EDITOR
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 AMCPlayerController::AMCPlayerController()
 {
@@ -24,6 +25,10 @@ AMCPlayerController::AMCPlayerController()
 	NoiseScale = 4;
 	
 	Range = 200.f;
+	DPS = 2.f;
+	LastDigTime = 0;
+	LastHitBox = FBox(FVector::ZeroVector, FVector::ZeroVector);
+	HitCounter = 0;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshFinder(TEXT("/Game/0_MC/Mesh/SM_MCCube"));
 	ChunkMesh = StaticMeshFinder.Object ? StaticMeshFinder.Object : nullptr;
@@ -33,9 +38,9 @@ AMCPlayerController::AMCPlayerController()
 	WorldSeed = FMath::RandRange(1, 1658);
 	PlayerAction = EPlayerAction::EPA_Playing;
 
-	DiggingDifficulty.Add("Grass", 2);
-	DiggingDifficulty.Add("Snow", 1);
-	DiggingDifficulty.Add("Stone", 8);
+	DiggingDifficulty.Add(Grass, 2);
+	DiggingDifficulty.Add(Snow, 1);
+	DiggingDifficulty.Add(Stone, 8);
 }
 
 void AMCPlayerController::BeginPlay()
@@ -65,7 +70,7 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 	if (CanDig() || CanBuild())
 	{
 		// Use universal tracing
-		
+
 		if (GetPawn())
 		{
 			FHitResult HitResult;
@@ -100,18 +105,54 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 				// Use tracing results based on player action
 				if (CanDig())
 				{
+					LastDigTime = GetWorld()->GetTimeSeconds();
+
 					// destroy hit instance if hit enough
 					if (UInstancedStaticMeshComponent* HitComp = Cast<UInstancedStaticMeshComponent>(HitResult.GetComponent()))
 					{
-						FBox PointOfImpact = FBox(HitResult.Location, HitResult.TraceEnd);
-						auto HitCubes = HitComp->GetInstancesOverlappingBox(PointOfImpact);
+						auto HitBox = FBox(HitResult.Location, HitResult.TraceEnd);
+						auto HitCubes = HitComp->GetInstancesOverlappingBox(HitBox);
 
-						for (auto Itr : HitCubes)
+						auto HitMaterial = HitResult.PhysMaterial;
+						
+						if (LastHitPhysMat == nullptr || ((LastHitPhysMat->GetName() == HitMaterial->GetName()) && (HitBox == LastHitBox)))
 						{
-							HitComp->RemoveInstance(Itr);
+							HitCounter++;
+							LastHitPhysMat = HitMaterial;
+							// No need to update LastHitBox because for it is roughly the same
+
+							// TODO
+							// Replace LastHitBox with hitInstanceIndex
+
+							if (HitCounter >= DiggingDifficulty.FindRef(HitMaterial->GetName()))
+							{
+								if (HitCubes.Num() >= 1)
+								{
+									HitComp->RemoveInstance(HitCubes[0]);
+
+									// Delete values because cube was hit for its last time
+									LastHitPhysMat = nullptr;
+									LastHitBox = FBox();
+									HitCounter = 0;
+
+									// This may delete multiple cubes if hit on edge. Precision not guaranteed therefore avoided
+									/*
+									for (auto Itr : HitCubes)
+									{
+										HitComp->RemoveInstance(Itr);
+									}
+									*/
+								}
+							}
+						}
+						else
+						{
+							// If we hit different block or different material reset values
+							HitCounter = 0;
+							LastHitPhysMat = HitMaterial;
+							LastHitBox = HitBox;
 						}
 					}
-					
 				}
 
 				if (CanBuild())
@@ -195,6 +236,10 @@ bool AMCPlayerController::SaveGame()
 
 bool AMCPlayerController::LoadGame()
 {
+	// TODO 
+	// fix crashing after loading
+	// fix some chunks not spawning
+
 	if (!GetPawn())
 	{
 		return false;
@@ -289,6 +334,12 @@ void AMCPlayerController::SetLastKnownChunkCoords(FVector2D NewCoords)
 {
 	LastKnownPlayerChunkCoord.X = NewCoords.X;
 	LastKnownPlayerChunkCoord.Y = NewCoords.Y;
+}
+
+bool AMCPlayerController::CanDig() const
+{
+	// Can dig if PlayerAction is digging AND elapsed enough time from last dig to prevent spaming
+	return (PlayerAction == EPlayerAction::EPA_Digging) && ((LastDigTime + DPS) <= GetWorld()->GetTimeSeconds());
 }
 
 void AMCPlayerController::DigStarted()

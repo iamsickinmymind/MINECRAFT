@@ -6,19 +6,27 @@
 #include "GameFramework/PlayerController.h"
 #include "MCPlayerController.generated.h"
 
-#define Snow = SurfaceType1;
-#define Grass = SurfaceType2;
-#define Stone = SurfaceType3;
-#define Dirt = SurfaceType4;
+// GetName returns UAsset name, not DisplayName
+/*
+#define Snow =	FString("SurfaceType1");
+#define Grass = FString("SurfaceType2");
+#define Stone = FString("SurfaceType3");
+#define Dirt =	FString("SurfaceType4");
+*/
+
+#define Snow	FString("PM_Snow")
+#define Grass	FString("PM_Grass")
+#define Stone	FString("PM_Stone")
+#define Dirt	FString("PM_Dirt")
 
 UENUM(BlueprintType)
 enum class EPlayerAction : uint8
 {
-	EPA_Playing		UMETA(DisplayName = "Playing"),
-	EPA_Digging		UMETA(DisplayName = "Digging"),
-	EPA_Building	UMETA(DisplayName = "Building"),
+	EPA_Playing		= 0 UMETA(DisplayName = "Playing"),
+	EPA_Digging		= 1 UMETA(DisplayName = "Digging"),
+	EPA_Building	= 2 UMETA(DisplayName = "Building"),
 
-	EPA_default		 UMETA(Hidden)
+	EPA_default		= 255 UMETA(Hidden)
 };
 
 
@@ -106,7 +114,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category ="Player")
-	FORCEINLINE bool CanDig() const {return PlayerAction == EPlayerAction::EPA_Digging; };
+	bool CanDig() const;
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Player")
 	FORCEINLINE bool CanBuild() const { return PlayerAction == EPlayerAction::EPA_Building; };
@@ -181,9 +189,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="Player|Interaction", meta=(UIMin = 0, ClampMin=0))
 	float Range;
 
+	/** How fast the digging can be. Digs per second.*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player|Interaction", meta = (UIMin = 0, ClampMin = 0))
+	float DPS;
+	float LastDigTime;
+
 	/** For each PhysicalMaterial define how many times player need to hit the Cube. If not defined default is 0; */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="Player|Interaction")
 	TMap<FString, int32> DiggingDifficulty;
+
+	TWeakObjectPtr<class UPhysicalMaterial> LastHitPhysMat = nullptr;
+	FBox LastHitBox;
+	int32 HitCounter;
 
 #pragma endregion PROTECTED_VARIABLES
 };
