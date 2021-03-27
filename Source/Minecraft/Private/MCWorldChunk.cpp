@@ -5,11 +5,6 @@
 #include <Materials/MaterialInstance.h>
 #include <SimplexNoiseBPLibrary.h>
 
-#define Snow = SurfaceType1;
-#define Grass = SurfaceType2;
-#define Stone = SurfaceType3;
-#define Dirt = SurfaceType4;
-
 // Sets default values
 AMCWorldChunk::AMCWorldChunk()
 {

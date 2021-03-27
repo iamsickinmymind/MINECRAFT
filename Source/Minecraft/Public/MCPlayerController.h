@@ -6,6 +6,11 @@
 #include "GameFramework/PlayerController.h"
 #include "MCPlayerController.generated.h"
 
+#define Snow = SurfaceType1;
+#define Grass = SurfaceType2;
+#define Stone = SurfaceType3;
+#define Dirt = SurfaceType4;
+
 UENUM(BlueprintType)
 enum class EPlayerAction : uint8
 {
@@ -100,6 +105,12 @@ public:
 		return PlayerAction;
 	}
 
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category ="Player")
+	FORCEINLINE bool CanDig() const {return PlayerAction == EPlayerAction::EPA_Digging; };
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Player")
+	FORCEINLINE bool CanBuild() const { return PlayerAction == EPlayerAction::EPA_Building; };
+
 	void DigStarted();
 	void DigStopped();
 
@@ -165,6 +176,14 @@ protected:
 	// Defines what action is player doing. This should be implemented in Player State tho
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player")
 	EPlayerAction PlayerAction;
+
+	/** How far from players viewpoint is digging and building allowed.*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="Player|Interaction", meta=(UIMin = 0, ClampMin=0))
+	float Range;
+
+	/** For each PhysicalMaterial define how many times player need to hit the Cube. If not defined default is 0; */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="Player|Interaction")
+	TMap<FString, int32> DiggingDifficulty;
 
 #pragma endregion PROTECTED_VARIABLES
 };

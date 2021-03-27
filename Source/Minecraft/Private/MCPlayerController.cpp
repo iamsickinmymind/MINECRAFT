@@ -8,6 +8,10 @@
 #include <MCSaveGame.h>
 #include <Blueprint/UserWidget.h>
 
+#ifdef WITH_EDITOR
+#include "DrawDebugHelpers.h"
+#endif WITH_EDITOR
+
 AMCPlayerController::AMCPlayerController()
 {
 	ChunksSize = 1200.f;
@@ -18,6 +22,8 @@ AMCPlayerController::AMCPlayerController()
 	VoxelSize = 100;
 	NoiseDensity = 0.00055;
 	NoiseScale = 4;
+	
+	Range = 200.f;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshFinder(TEXT("/Game/0_MC/Mesh/SM_MCCube"));
 	ChunkMesh = StaticMeshFinder.Object ? StaticMeshFinder.Object : nullptr;
@@ -26,6 +32,10 @@ AMCPlayerController::AMCPlayerController()
 
 	WorldSeed = FMath::RandRange(1, 1658);
 	PlayerAction = EPlayerAction::EPA_Playing;
+
+	DiggingDifficulty.Add("Grass", 2);
+	DiggingDifficulty.Add("Snow", 1);
+	DiggingDifficulty.Add("Stone", 8);
 }
 
 void AMCPlayerController::BeginPlay()
@@ -52,7 +62,68 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 	// Check PlayerAction
 	// If Digging Raycast from ViewPoint and process FHitResult
 	// If Building Raycast from ViewPoint and process SpawnNewCube
+	if (CanDig() || CanBuild())
+	{
+		// Use universal tracing
+		
+		if (GetPawn())
+		{
+			FHitResult HitResult;
+			FVector ViewLoc;
+			FRotator ViewRot;
+			GetPlayerViewPoint(ViewLoc, ViewRot);
 
+			FVector EndLoc;
+			EndLoc = ViewRot.Vector();
+
+			FVector RaycastEnd = (Range * EndLoc) + ViewLoc;
+
+			FCollisionQueryParams CollisionQueryParams;
+				CollisionQueryParams.AddIgnoredActor(this);
+				CollisionQueryParams.AddIgnoredActor(GetPawn());
+				CollisionQueryParams.bReturnPhysicalMaterial = true;
+			FCollisionResponseParams CollisionResponsParams;
+
+			#ifdef WITH_EDITOR
+			FVector _RaycastStart = ViewLoc;
+			FVector _RaycastEnd = RaycastEnd;
+			DrawDebugLine(GetWorld(), _RaycastStart, _RaycastEnd, FColor::Red, false, 3, 0, 2.f);
+			#endif WITH_EDITOR
+
+			if (GetWorld()->LineTraceSingleByChannel(HitResult, ViewLoc, RaycastEnd, ECC_Visibility, CollisionQueryParams, CollisionResponsParams))
+			{
+
+				#ifdef WITH_EDITOR
+				DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 16.f, 8, FColor::Red, false, 1);
+				#endif WITH_EDITOR
+
+				// Use tracing results based on player action
+				if (CanDig())
+				{
+					// destroy hit instance if hit enough
+					if (UInstancedStaticMeshComponent* HitComp = Cast<UInstancedStaticMeshComponent>(HitResult.GetComponent()))
+					{
+						FBox PointOfImpact = FBox(HitResult.Location, HitResult.TraceEnd);
+						auto HitCubes = HitComp->GetInstancesOverlappingBox(PointOfImpact);
+
+						for (auto Itr : HitCubes)
+						{
+							HitComp->RemoveInstance(Itr);
+						}
+					}
+					
+				}
+
+				if (CanBuild())
+				{
+					// spawn block instance if possible
+				}
+			}
+		}
+
+		
+	}
+	
 	// Check every tick whether player moved from hist last chunk.
 	// Smaller chunks = heavier impact on performance, smoother visibility & spawns
 
