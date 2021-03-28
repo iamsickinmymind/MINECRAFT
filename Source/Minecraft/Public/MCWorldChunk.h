@@ -30,6 +30,7 @@ protected:
 	//void InitializeWorldChunk();
 	bool Get3DNoiseZ(const float InNoiseCutof, const float InNoiseDensity);
 	void SpawnCubeInstance();
+	bool IsBlockDeleted(FVector &CheckLocation) const;
 	void AddVoxelInstanceOfType(class UInstancedStaticMeshComponent* InstanceType);
 
 #pragma region PROTECTED_VARIABLES
@@ -81,6 +82,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings|Hidden")
 	TArray<class UInstancedStaticMeshComponent*> InstancedBoxes;
+
+	TArray<FVector> DeletedBlocksLocations;
 
 #pragma endregion PROTECTED_VARIABLES
 };

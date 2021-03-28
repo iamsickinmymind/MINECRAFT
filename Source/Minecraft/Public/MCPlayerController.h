@@ -119,6 +119,8 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Player")
 	FORCEINLINE bool CanBuild() const { return PlayerAction == EPlayerAction::EPA_Building; };
 
+	FORCEINLINE TArray<FVector> GetDeletedBlocksLocations() const { return DeletedCubesLocations;};
+
 	void DigStarted();
 	void DigStopped();
 

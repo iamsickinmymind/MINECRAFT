@@ -48,7 +48,11 @@ bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TA
 {
 	if (!(UGameplayStatics::DoesSaveGameExist(SaveSlotName, 0)))
 	{
+
+		#ifdef WITH_EDITOR
 		UE_LOG(LogTemp, Error, TEXT("SaveGame Does Not Exist: %s"), *SaveSlotName)
+		#endif WITH_EDITOR
+		
 		return false;
 	}
 

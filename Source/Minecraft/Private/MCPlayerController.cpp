@@ -503,6 +503,9 @@ void AMCPlayerController::DestroyChunks()
 		{
 			if (SpawnedChunksRefs[i]) 
 			{
+				// TODO
+				// Rather than deleting chunks use ClearInstances() for those chunks
+				// It might be better for performance and then just spawn new chunks atop those empty old ones
 				SpawnedChunksRefs[i]->Destroy();
 				SpawnedChunksRefs.RemoveAt(i);
 				SpawnedChunksCoords.RemoveAt(i);
