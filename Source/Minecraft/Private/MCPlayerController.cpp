@@ -42,6 +42,7 @@ AMCPlayerController::AMCPlayerController()
 	DiggingDifficulty.Add(Grass, 2);
 	DiggingDifficulty.Add(Snow, 1);
 	DiggingDifficulty.Add(Stone, 8);
+	DiggingDifficulty.Add(Dirt, 3);
 }
 
 void AMCPlayerController::BeginPlay()
@@ -186,6 +187,8 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 							#ifdef WITH_EDITOR
 							DrawDebugBox(GetWorld(), SpawnInstanceLocation, FVector(50), FColor::White, false, 2, 0, 1);
 							#endif WITH_EDITOR
+
+							
 
 							HitChunk->ForceNewInstance(SpawnInstanceLocation, HitComp);
 						}
@@ -414,6 +417,11 @@ void AMCPlayerController::BuildingStopped()
 	}
 }
 
+void AMCPlayerController::BuildingPressed()
+{
+
+}
+
 void AMCPlayerController::SpawnChunks()
 {
 
@@ -467,9 +475,6 @@ void AMCPlayerController::SpawnChunks()
 		}
 
 	}
-
-	UE_LOG(LogTemp, Error, TEXT("Finished calculating spawn locations"))
-
 	
 	/************************************************************************/
 	/*                      SPAWN CHUNKS ON LOCATIONS                       */

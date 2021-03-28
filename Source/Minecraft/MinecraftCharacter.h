@@ -62,6 +62,14 @@ protected:
 	UFUNCTION()
 	void BuildingRequest();
 
+	UFUNCTION()
+	void BuildingPressed();
+
+	void Slot1();
+	void Slot2();
+	void Slot3();
+	void Slot4();
+
 public:
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }

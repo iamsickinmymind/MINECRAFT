@@ -17,9 +17,11 @@ AMCWorldChunk::AMCWorldChunk()
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MaterialInstanceFinder_Snow(TEXT("/Game/0_MC/Materials/MI_Snow"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MaterialInstanceFinder_Grass(TEXT("/Game/0_MC/Materials/MI_Grass"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MaterialInstanceFinder_Stone(TEXT("/Game/0_MC/Materials/MI_Stone"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MaterialInstanceFinder_Dirt(TEXT("/Game/0_MC/Materials/MI_Dirt"));
 	MaterialsMapping.Add(0, MaterialInstanceFinder_Snow.Object);
 	MaterialsMapping.Add(1, MaterialInstanceFinder_Grass.Object);
 	MaterialsMapping.Add(2, MaterialInstanceFinder_Stone.Object);
+	MaterialsMapping.Add(3, MaterialInstanceFinder_Dirt.Object);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshFinder(TEXT("/Game/0_MC/Mesh/SM_MCCube"));
 	BoxMesh = StaticMeshFinder.Object;
@@ -48,9 +50,12 @@ AMCWorldChunk::AMCWorldChunk()
 		}
 	}
 	// Create ISM for manually created blocks
+	// This logic is replaced by adding new blocks to existing ISMCs
+	/*
 	ManuallySpawnedGrass = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ManuallySpawnedBlocks"));
 		ManuallySpawnedGrass->SetupAttachment(GetRootComponent());
 		InstancedBoxes.Add(ManuallySpawnedGrass);
+	*/
 
 	Area = 5;
 	Depth = 3;
@@ -61,9 +66,7 @@ AMCWorldChunk::AMCWorldChunk()
 	_3DNoiseCutOff = 0.f;
 	SnowTreshold = 500;
 	GrassTreshold = 350;
-
-	// TODO: Remove from constructor and use only manually - BeginPlay?
-	//SpawnWorldChunk();
+	DirtTreshold = 0;
 }
 
 // TODO
@@ -196,13 +199,24 @@ void AMCWorldChunk::SpawnCubeInstance()
 
 	if(WorldVoxelPos_Z_Noised > SnowTreshold) 
 	{
-		activeIndex = 0;
+		activeIndex = 0; // Snow
 	}
-	else if (WorldVoxelPos_Z_Noised < GrassTreshold) 
+	else if(WorldVoxelPos_Z_Noised > GrassTreshold && WorldVoxelPos_Z_Noised < SnowTreshold)
 	{
-		activeIndex = 1;
+		activeIndex = 2; // Stone
 	}
-	else activeIndex = 2;
+	else if (WorldVoxelPos_Z_Noised < GrassTreshold && WorldVoxelPos_Z_Noised > DirtTreshold) 
+	{
+		activeIndex = 1; // Grass
+	}
+	else if (WorldVoxelPos_Z_Noised < DirtTreshold)
+	{
+		activeIndex = 3; // Dirt
+	}
+	else
+	{
+		activeIndex = 2; // Stone
+	}
 	/*else if ( here goes implementation of any other material type )
 	{
 		activeIndex = 2;

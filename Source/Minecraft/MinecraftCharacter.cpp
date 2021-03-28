@@ -66,6 +66,7 @@ void AMinecraftCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("BuildingMode", IE_Pressed, this, &AMinecraftCharacter::BuildingRequest);
 	PlayerInputComponent->BindAction("DiggingMode", IE_Pressed, this, &AMinecraftCharacter::DigRequest);
 	PlayerInputComponent->BindAction("DiggingMode", IE_Released, this, &AMinecraftCharacter::DigRequest);
+	PlayerInputComponent->BindAction("BuildingPressed", IE_Pressed, this, &AMinecraftCharacter::BuildingPressed);
 }
 
 void AMinecraftCharacter::EscapePressed()
@@ -92,6 +93,34 @@ void AMinecraftCharacter::BuildingRequest()
 	{
 		PlayerCon->BuildingStarted();
 	}
+}
+
+void AMinecraftCharacter::BuildingPressed()
+{
+	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
+	{
+		PlayerCon->BuildingPressed();
+	}
+}
+
+void AMinecraftCharacter::Slot1()
+{
+
+}
+
+void AMinecraftCharacter::Slot2()
+{
+
+}
+
+void AMinecraftCharacter::Slot3()
+{
+
+}
+
+void AMinecraftCharacter::Slot4()
+{
+
 }
 
 void AMinecraftCharacter::MoveForward(float Value)

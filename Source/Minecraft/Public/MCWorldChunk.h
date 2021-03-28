@@ -66,11 +66,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0, ExposeOnSpawn = "true", DisplayName="3D CutOff Noise Treshold"))
 	float _3DNoiseCutOff;
 
+	/** Higher values = snow*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0))
 	float SnowTreshold;
 
+	/** Lower values = Grass*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0))
 	float GrassTreshold;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Noise", meta = (ClampMin = 0, UIMin = 0))
+	float DirtTreshold;
 
 	int32 LocalVoxelPos_X;
 	int32 LocalVoxelPos_Y;

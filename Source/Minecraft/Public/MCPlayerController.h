@@ -29,7 +29,6 @@ enum class EPlayerAction : uint8
 	EPA_default		= 255 UMETA(Hidden)
 };
 
-
 /**
  * 
  */
@@ -126,6 +125,7 @@ public:
 
 	void BuildingStarted();
 	void BuildingStopped();
+	void BuildingPressed();
 
 #pragma endregion PUBLIC_FUNCTIONS
 
@@ -207,6 +207,9 @@ protected:
 
 	TArray<FVector> DeletedCubesLocations;
 	TArray<FVector> PlayerSpawnedCubesLocations;
+
+	int32 ActiveSlotIndex;
+	bool bBuildingPressed;
 
 #pragma endregion PROTECTED_VARIABLES
 };
