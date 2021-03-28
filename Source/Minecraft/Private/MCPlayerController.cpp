@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+// If replication is required this logic should be moved somewhere else, maybe GameState
 
 #include "MCPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
