@@ -10,7 +10,7 @@ UMCSaveGame::UMCSaveGame()
 }
 
 // TODO: FStruct SaveGameData
-bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave, FVector2D LastKnownPlayerPosToSave, TArray<FVector> _DeletedBlocksLocations)
+bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave, FVector2D LastKnownPlayerPosToSave, TArray<FVector> _DeletedBlocksLocations, TMap<FVector, int32> _SpawnedBlocksMapping)
 {
 	if (UMCSaveGame* SaveGameInstance = Cast<UMCSaveGame>(UGameplayStatics::CreateSaveGameObject(UMCSaveGame::StaticClass())))
 	{
@@ -22,6 +22,7 @@ bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, 
 		SaveGameInstance->PlayerPosition = FVector(0);
 		SaveGameInstance->LastKnownPlayerPos = FVector2D(0);
 		SaveGameInstance->DeletedBlocksLocations.Empty();
+		SaveGameInstance->SpawnedBlocksMapping.Empty();
 		
 		SaveGameInstance->SpawnedChunksRefs = SpawnedChunksToSave;
 		SaveGameInstance->SpawnedChunksCoords = SpawnCoordsToSave;
@@ -29,6 +30,7 @@ bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, 
 		SaveGameInstance->PlayerPosition = PlayerPositionToSave;
 		SaveGameInstance->LastKnownPlayerPos = LastKnownPlayerPosToSave;
 		SaveGameInstance->DeletedBlocksLocations = _DeletedBlocksLocations;
+		SaveGameInstance->SpawnedBlocksMapping = _SpawnedBlocksMapping;
 
 		// Save the data immediately.
 		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveSlotName, 0))
@@ -44,7 +46,7 @@ bool UMCSaveGame::SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, 
 	return false;
 }
 
-bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition, FVector2D &LastKnownPlayerPosToLoad, TArray<FVector> &SpawnDeletedBlocksLocations)
+bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition, FVector2D &LastKnownPlayerPosToLoad, TArray<FVector> &SpawnDeletedBlocksLocations, TMap<FVector, int32> &SpawnSpawnedBlocksMapping)
 {
 	if (!(UGameplayStatics::DoesSaveGameExist(SaveSlotName, 0)))
 	{
@@ -70,10 +72,9 @@ bool UMCSaveGame::GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TA
 			SpawnLocationsToLoad = LoadGameInstance->SpawnedChunksLocations;
 
 			SpawnPlayerPosition = LoadGameInstance->PlayerPosition;
-
 			LastKnownPlayerPosToLoad = LoadGameInstance->LastKnownPlayerPos;
-
 			SpawnDeletedBlocksLocations = LoadGameInstance->DeletedBlocksLocations;
+			SpawnSpawnedBlocksMapping = LoadGameInstance->SpawnedBlocksMapping; 
 
 			return true;
 		}

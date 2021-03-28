@@ -193,6 +193,7 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 						{
 
 							HitChunk->ForceNewInstance(SpawnInstanceLocation, ActiveSlotIndex);
+							PlayerSpawnedCubesLocations.Add(SpawnInstanceLocation, ActiveSlotIndex);
 							// This logic is deprecated since I pass only index to find mapping material
 							/*
 							if (UInstancedStaticMeshComponent* HitComp = Cast<UInstancedStaticMeshComponent>(HitResult.GetComponent()))
@@ -276,7 +277,7 @@ bool AMCPlayerController::SaveGame()
 	UMCSaveGame* NewSaveGame = NewObject<UMCSaveGame>();
 	if (NewSaveGame)
 	{
-		return NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, GetPawn()->GetActorLocation(), LastKnownPlayerChunkCoord, DeletedCubesLocations);
+		return NewSaveGame->SetSaveData(SpawnedChunksRefs, SpawnedChunksCoords, SpawnedChunksLocations, GetPawn()->GetActorLocation(), LastKnownPlayerChunkCoord, DeletedCubesLocations, PlayerSpawnedCubesLocations);
 	}
 
 	return false;
@@ -302,8 +303,9 @@ bool AMCPlayerController::LoadGame()
 		TArray<FVector> TmpSpawnedChunksLocations;
 		FVector2D TempLastKnownPlayerChunkCoord;
 		TArray<FVector> TempDeletedBlocksLocations;
+		TMap<FVector, int32> TempPlayerSpawnedCubesLocations;
 
-		if( NewLoadGame->GetSaveData(TempSpawnedChunksRefs, TempSpawnedChunksCoords, TmpSpawnedChunksLocations, NewPlayerPosition, TempLastKnownPlayerChunkCoord, TempDeletedBlocksLocations))
+		if( NewLoadGame->GetSaveData(TempSpawnedChunksRefs, TempSpawnedChunksCoords, TmpSpawnedChunksLocations, NewPlayerPosition, TempLastKnownPlayerChunkCoord, TempDeletedBlocksLocations, TempPlayerSpawnedCubesLocations))
 		{
 			// TODO: reload the world here
 
@@ -313,6 +315,12 @@ bool AMCPlayerController::LoadGame()
 				if (Itr == Cast<AMCWorldChunk>(Itr))
 				{
 					Itr->Destroy();
+// 					TArray<UInstancedStaticMeshComponent*> ItrComps;
+// 					Itr->GetComponents<UInstancedStaticMeshComponent>(ItrComps);
+// 					for (auto ItrComp : ItrComps)
+// 					{
+// 						ItrComp->ClearInstances();
+// 					}
 				}
 			}
 			
@@ -321,11 +329,13 @@ bool AMCPlayerController::LoadGame()
 			SpawnedChunksCoords.Empty();
 			SpawnedChunksLocations.Empty();
 			DeletedCubesLocations.Empty();
+			PlayerSpawnedCubesLocations.Empty();
 
 			SpawnedChunksRefs = TempSpawnedChunksRefs;
 			SpawnedChunksCoords = TempSpawnedChunksCoords;
 			SpawnedChunksLocations = TmpSpawnedChunksLocations;
 			DeletedCubesLocations = TempDeletedBlocksLocations;
+			PlayerSpawnedCubesLocations = TempPlayerSpawnedCubesLocations;
 
 			for (int32 i = 0; i < SpawnedChunksRefs.Num(); i++)
 			{
@@ -510,6 +520,7 @@ void AMCPlayerController::SpawnChunks()
 			FRotator TempRot;
 			FActorSpawnParameters TempParams;
 			TempParams.bNoFail = true;
+			TempParams.Owner = this;
 			TempParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
 
 			AActor* TempChunk = GetWorld()->SpawnActor<AActor>(WorldChunkClass, ItrLoc, TempRot, TempParams);

@@ -92,6 +92,7 @@ protected:
 	TArray<class UInstancedStaticMeshComponent*> InstancedBoxes;
 
 	TArray<FVector> DeletedBlocksLocations;
+	TMap<FVector, int32> PlayerSpawnedBlocksLocations;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings|Hidden")
 	class UInstancedStaticMeshComponent* ManuallySpawnedGrass = nullptr;

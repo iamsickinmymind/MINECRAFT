@@ -94,11 +94,15 @@ void AMCWorldChunk::PostActorCreated()
 
 	if (GetOwner())
 	{
-		AMCPlayerController* OwningPlayerCon = Cast<AMCPlayerController>(GetWorld());
+		AMCPlayerController* OwningPlayerCon = Cast<AMCPlayerController>(GetOwner());
 		if (OwningPlayerCon)
 		{
 			DeletedBlocksLocations.Empty();
-			DeletedBlocksLocations = OwningPlayerCon->GetDeletedBlocksLocations();
+			OwningPlayerCon->GetDeletedBlocksLocations(DeletedBlocksLocations);
+			// DeletedBlocksLocations = OwningPlayerCon->GetDeletedBlocksLocations();
+
+			PlayerSpawnedBlocksLocations.Empty();
+			OwningPlayerCon->GetPlayerSpawnedBlocks(PlayerSpawnedBlocksLocations);
 		}
 	}
 }
@@ -180,6 +184,12 @@ void AMCWorldChunk::SpawnWorldChunk()
 				}
 			}
 		}
+	}
+
+	// Spawn back player blocks
+	for (const TPair<FVector, int32>& pair : PlayerSpawnedBlocksLocations)
+	{
+		ForceNewInstance(pair.Key, pair.Value);
 	}
 }
 

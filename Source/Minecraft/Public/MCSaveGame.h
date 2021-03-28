@@ -7,23 +7,16 @@
 #include "MCSaveGame.generated.h"
 
 USTRUCT(BlueprintType)
-struct FChunkData
+struct FSaveData
 {
 	GENERATED_BODY()
 
-	FChunkData()
+	FSaveData()
 	{
-		;
-	};
-
-	FChunkData(TArray<FVector> _DestroyedLocations)
-	{
-		DestroyedLocations = _DestroyedLocations;
 	};
 
 protected:
 
-	TArray<FVector> DestroyedLocations;
 };
 
 /**
@@ -38,13 +31,10 @@ class MINECRAFT_API UMCSaveGame : public USaveGame
 
 public:
 
-	// TODO: Replace with & to save transports (or is it dangerous for SaveGame?)
-	bool SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave, FVector2D LastKnownPlayerPosToSave, TArray<FVector> _DeletedBlocksLocations);
+	// TODO: Replace with struct
+	bool SetSaveData(TArray<class AMCWorldChunk*> SpawnedChunksToSave, TArray<FIntVector> SpawnCoordsToSave, TArray<FVector> SpawnLocationsToSave, FVector PlayerPositionToSave, FVector2D LastKnownPlayerPosToSave, TArray<FVector> _DeletedBlocksLocations, TMap<FVector, int32> _SpawnedBlocksMapping);
 
-	bool GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition, FVector2D &LastKnownPlayerPosToLoad, TArray<FVector> &SpawnDeletedBlocksLocations);
-
-	UFUNCTION(BlueprintCallable, Category = "TEST")
-	FORCEINLINE bool CallFromBP() { return true; };
+	bool GetSaveData(TArray<class AMCWorldChunk*> &WorlChunksToLoad, TArray<FIntVector> &SpawnCoordsToLoad, TArray<FVector> &SpawnLocationsToLoad, FVector &SpawnPlayerPosition, FVector2D &LastKnownPlayerPosToLoad, TArray<FVector> &SpawnDeletedBlocksLocations, TMap<FVector, int32> &SpawnSpawnedBlocksMapping);
 
 private:
 	UPROPERTY(SaveGame)
@@ -64,6 +54,9 @@ private:
 
 	UPROPERTY(SaveGame)
 	TArray<FVector> DeletedBlocksLocations;
+
+	UPROPERTY(SaveGame)
+	TMap<FVector, int32> SpawnedBlocksMapping;
 
 	FString SaveSlotName;
 };

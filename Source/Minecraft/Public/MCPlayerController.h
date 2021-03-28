@@ -122,6 +122,10 @@ public:
 	FORCEINLINE bool CanBuild() const { return PlayerAction == EPlayerAction::EPA_Building; };
 
 	FORCEINLINE TArray<FVector> GetDeletedBlocksLocations() const { return DeletedCubesLocations;};
+	
+	void GetDeletedBlocksLocations(TArray<FVector> &_DeletedCubesLocations) { _DeletedCubesLocations = DeletedCubesLocations; };
+
+	void GetPlayerSpawnedBlocks(TMap<FVector, int32> &_PlayerSpawnedCubesLocations) const { _PlayerSpawnedCubesLocations = PlayerSpawnedCubesLocations; };
 
 	void DigStarted();
 	void DigStopped();
@@ -211,7 +215,7 @@ protected:
 	int32 LastHitInstanceIndex;
 
 	TArray<FVector> DeletedCubesLocations;
-	TArray<FVector> PlayerSpawnedCubesLocations;
+	TMap<FVector, int32> PlayerSpawnedCubesLocations;
 
 	int32 ActiveSlotIndex;
 	bool bBuildingAllowed;
