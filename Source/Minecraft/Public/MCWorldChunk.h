@@ -21,6 +21,9 @@ public:
 
 	void PostActorCreated() override;
 
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void ForceNewInstance(FVector SpawnLoc, UInstancedStaticMeshComponent* SpawnISMC);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -84,6 +87,9 @@ protected:
 	TArray<class UInstancedStaticMeshComponent*> InstancedBoxes;
 
 	TArray<FVector> DeletedBlocksLocations;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings|Hidden")
+	class UInstancedStaticMeshComponent* ManuallySpawnedGrass = nullptr;
 
 #pragma endregion PROTECTED_VARIABLES
 };

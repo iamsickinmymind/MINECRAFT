@@ -31,7 +31,7 @@ AMCWorldChunk::AMCWorldChunk()
 		if (NewComp)
 		{
 			//NewComp->AttachTo(GetRootComponent());
-			FAttachmentTransformRules SpawnTransRules = FAttachmentTransformRules::SnapToTargetIncludingScale;
+			// FAttachmentTransformRules SpawnTransRules = FAttachmentTransformRules::SnapToTargetIncludingScale;
 			NewComp->SetupAttachment(GetRootComponent());
 
 			InstancedBoxes.Add(NewComp);
@@ -47,6 +47,10 @@ AMCWorldChunk::AMCWorldChunk()
 			}
 		}
 	}
+	// Create ISM for manually created blocks
+	ManuallySpawnedGrass = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ManuallySpawnedBlocks"));
+		ManuallySpawnedGrass->SetupAttachment(GetRootComponent());
+		InstancedBoxes.Add(ManuallySpawnedGrass);
 
 	Area = 5;
 	Depth = 3;
@@ -62,6 +66,8 @@ AMCWorldChunk::AMCWorldChunk()
 	//SpawnWorldChunk();
 }
 
+// TODO
+// Remove this chunk of code and request those data from PostActorCreated
 void AMCWorldChunk::Init(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 NewDepth, int32 NewVoxelSize, float NewNoiseDensity, int32 NewNoiseScale, float New3DNoiseDensity, float New3DNoiseCutOff)
 {
 	BoxMesh = NewBoxMesh;
@@ -79,8 +85,9 @@ void AMCWorldChunk::Init(class UStaticMesh* NewBoxMesh, int32 NewArea, int32 New
 void AMCWorldChunk::PostActorCreated()
 {
 	Super::PostActorCreated();
-
-	UE_LOG(LogTemp, Warning, TEXT("Calling PostActorCreated"))
+	
+	// TODO
+	// request values from AMCPlayerController to overwrite default ones
 
 	if (GetOwner())
 	{
@@ -91,6 +98,16 @@ void AMCWorldChunk::PostActorCreated()
 			DeletedBlocksLocations = OwningPlayerCon->GetDeletedBlocksLocations();
 		}
 	}
+}
+
+void AMCWorldChunk::ForceNewInstance(FVector SpawnLoc, UInstancedStaticMeshComponent* SpawnISMC)
+{
+	if (SpawnISMC == nullptr) return;
+	FTransform SpawnTransform = FTransform(FRotator(0), SpawnLoc, FVector(1));
+
+	// TODO
+	// Find material by index mapping and select right ISMC
+	SpawnISMC->AddInstance(SpawnTransform);
 }
 
 void AMCWorldChunk::BeginPlay()
@@ -113,7 +130,7 @@ void AMCWorldChunk::SpawnWorldChunk()
 		{
 			LocalVoxelPos_Y = j;
 
-			for (int32 k = (Depth * (-1)); k < Depth; k++) // OPTiMISE <------- Do not create Depth blocks where not visible (detect whether location has cubes on all sides except bottom if so skip)
+			for (int32 k = (Depth * (-1)); k < Depth; k++) // OPTIMISE <------- Do not create Depth blocks where not visible (detect whether location has cubes on all sides except bottom if so skip)
 			{
 				LocalVoxelPos_Z = k;
 
@@ -185,12 +202,18 @@ void AMCWorldChunk::SpawnCubeInstance()
 	{
 		activeIndex = 1;
 	}
-	else 
+	else activeIndex = 2;
+	/*else if ( here goes implementation of any other material type )
 	{
 		activeIndex = 2;
 	}
+	*/
+	
 
-	AddVoxelInstanceOfType(InstancedBoxes[activeIndex]);
+	if(activeIndex < InstancedBoxes.Num()) // <------- active index must not be outside the range
+	{
+		AddVoxelInstanceOfType(InstancedBoxes[activeIndex]);
+	}
 }
 
 bool AMCWorldChunk::IsBlockDeleted(FVector &CheckLocation) const
@@ -200,7 +223,7 @@ bool AMCWorldChunk::IsBlockDeleted(FVector &CheckLocation) const
 	bool bLocationDeleted = false;
 	for (auto Itr : DeletedBlocksLocations)
 	{	
-		if (Itr == CheckLocation) // <----------- ask earlier that in the last iteration tho
+		if (Itr == CheckLocation) // <----------- ask earlier that in the last iteration tho to save some performance?
 		{
 			bLocationDeleted = true;
 			break;
@@ -213,7 +236,7 @@ bool AMCWorldChunk::IsBlockDeleted(FVector &CheckLocation) const
 void AMCWorldChunk::AddVoxelInstanceOfType(class UInstancedStaticMeshComponent* InstanceType)
 {
 	FVector SpawnLocation = FVector((VoxelSize * LocalVoxelPos_X), (VoxelSize * LocalVoxelPos_Y), (WorldVoxelPos_Z_Noised));
-	FTransform InstanceSpawnTransform = FTransform(FRotator(0), SpawnLocation, FVector(1)); //FVector((VoxelSize * LocalVoxelPos_X), (VoxelSize * LocalVoxelPos_Y), (WorldVoxelPos_Z_Noised)), FVector(1));
+	FTransform InstanceSpawnTransform = FTransform(FRotator(0), SpawnLocation, FVector(1));
 	
 	if (IsBlockDeleted(SpawnLocation))
 	{

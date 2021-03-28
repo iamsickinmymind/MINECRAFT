@@ -90,12 +90,6 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 				CollisionQueryParams.bReturnPhysicalMaterial = true;
 			FCollisionResponseParams CollisionResponsParams;
 
-			#ifdef WITH_EDITOR
-			FVector _RaycastStart = ViewLoc;
-			FVector _RaycastEnd = RaycastEnd;
-			DrawDebugLine(GetWorld(), _RaycastStart, _RaycastEnd, FColor::Red, false, 3, 0, 2.f);
-			#endif WITH_EDITOR
-
 			if (GetWorld()->LineTraceSingleByChannel(HitResult, ViewLoc, RaycastEnd, ECC_Visibility, CollisionQueryParams, CollisionResponsParams))
 			{
 
@@ -176,6 +170,27 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 				if (CanBuild())
 				{
 					// spawn block instance if possible
+					// OPTIMISE get HitComp a step earlier to I can use the HitComp for both Dig and Build
+					// TODO introduce building control 
+						// spawn blocks only after LMB is pressed && PlayerAction == Building
+						// this is too complicated maybe I should approach building the same way I do digging using timers
+					if (AMCWorldChunk* HitChunk = Cast<AMCWorldChunk>(HitResult.Actor))
+					{
+						if (UInstancedStaticMeshComponent* HitComp = Cast<UInstancedStaticMeshComponent>(HitResult.GetComponent()))
+						{
+							float TempX = FMath::GridSnap(HitResult.ImpactPoint.X, VoxelSize);
+							float TempY = FMath::GridSnap(HitResult.ImpactPoint.Y, VoxelSize);
+							float TempZ = FMath::GridSnap(HitResult.ImpactPoint.Z, VoxelSize);
+							FVector SpawnInstanceLocation = FVector(TempX, TempY, TempZ);
+
+							#ifdef WITH_EDITOR
+							DrawDebugBox(GetWorld(), SpawnInstanceLocation, FVector(50), FColor::White, false, 2, 0, 1);
+							#endif WITH_EDITOR
+
+							HitChunk->ForceNewInstance(SpawnInstanceLocation, HitComp);
+						}
+					}
+					
 				}
 			}
 		}
@@ -503,10 +518,21 @@ void AMCPlayerController::DestroyChunks()
 		{
 			if (SpawnedChunksRefs[i]) 
 			{
-				// TODO
+				// OPTIMISE
 				// Rather than deleting chunks use ClearInstances() for those chunks
 				// It might be better for performance and then just spawn new chunks atop those empty old ones
-				SpawnedChunksRefs[i]->Destroy();
+				// SpawnedChunksRefs[i]->Destroy();
+				
+				// TODO 
+				// use GetComponents instead for its new API implementation
+				auto ChunkComponents = SpawnedChunksRefs[i]->GetComponentsByClass(UInstancedStaticMeshComponent::StaticClass());
+				for (auto Itr : ChunkComponents)
+				{
+					if (UInstancedStaticMeshComponent* TempComp = Cast<UInstancedStaticMeshComponent>(Itr))
+					{
+						TempComp->ClearInstances();
+					}
+				}
 				SpawnedChunksRefs.RemoveAt(i);
 				SpawnedChunksCoords.RemoveAt(i);
 				SpawnedChunksLocations.RemoveAt(i);
