@@ -10,3 +10,9 @@ All videos are recorded on laptop with following specs:
 
 
 [VIDEO LINK](https://vimeo.com/showcase/8297492)
+
+## Timestamp
+- Started on Friday roughly at 19:00 CET
+- Ended on Sunday roughly at 20:05 CET
+- 19 hours of worktime (including reading documentation, creating prototype Blueprints, debugging etc.)
+- 34 hours of time (including switching Spotify music, cuddling with cats, drinking, preparing coffee etc.)
