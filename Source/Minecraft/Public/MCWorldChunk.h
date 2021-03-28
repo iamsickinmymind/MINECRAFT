@@ -22,7 +22,7 @@ public:
 	void PostActorCreated() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
-	void ForceNewInstance(FVector SpawnLoc, UInstancedStaticMeshComponent* SpawnISMC);
+	void ForceNewInstance(FVector SpawnLoc, int32 BlockIndex);
 
 protected:
 

@@ -67,11 +67,12 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	UE_LOG(LogTemp, Warning, TEXT("BuildingAllowed: %d (0 No | 1 Yes)"), bBuildingAllowed)
+
 	// TODO
 	// Check PlayerAction
 	// If Digging Raycast from ViewPoint and process FHitResult
 	// If Building Raycast from ViewPoint and process SpawnNewCube
-	// Break this into funtions that will read FHitResult so Tick is much cleaner and easier to read
 	if (CanDig() || CanBuild())
 	{
 		// Use universal tracing
@@ -120,8 +121,8 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 							LastHitInstanceIndex = HitCubes[0];
 							HitCounter++;
 							LastHitPhysMat = HitMaterial;
-							
-							// Sometimes the hitcounter resets so this is just debug
+							// No need to update LastHitBox because for it is roughly the same
+
 							UE_LOG(LogTemp, Warning, TEXT("HitCounter: %d for %s"), HitCounter, *HitMaterial->GetName())
 
 							// TODO
@@ -145,8 +146,7 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 									HitCounter = 0;
 
 									// Save game after deleting a cube.
-									// Too heavy let them do it manually
-									// SaveGame();
+									SaveGame();
 
 									// This may delete multiple cubes if hit on edge. Precision not guaranteed therefore avoided
 									/*
@@ -435,8 +435,6 @@ void AMCPlayerController::BuildingPressed()
 	{
 		bBuildingAllowed = true;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("BuildingAllowed: %d"), bBuildingAllowed)
 }
 
 void AMCPlayerController::SwitchBlockType(int32 NewIndex)

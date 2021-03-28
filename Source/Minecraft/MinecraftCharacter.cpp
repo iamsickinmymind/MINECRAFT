@@ -67,6 +67,11 @@ void AMinecraftCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("DiggingMode", IE_Pressed, this, &AMinecraftCharacter::DigRequest);
 	PlayerInputComponent->BindAction("DiggingMode", IE_Released, this, &AMinecraftCharacter::DigRequest);
 	PlayerInputComponent->BindAction("BuildingPressed", IE_Pressed, this, &AMinecraftCharacter::BuildingPressed);
+
+	PlayerInputComponent->BindAction("Slot1", IE_Pressed, this, &AMinecraftCharacter::Slot1);
+	PlayerInputComponent->BindAction("Slot2", IE_Pressed, this, &AMinecraftCharacter::Slot2);
+	PlayerInputComponent->BindAction("Slot3", IE_Pressed, this, &AMinecraftCharacter::Slot3);
+	PlayerInputComponent->BindAction("Slot4", IE_Pressed, this, &AMinecraftCharacter::Slot4);
 }
 
 void AMinecraftCharacter::EscapePressed()
@@ -105,22 +110,34 @@ void AMinecraftCharacter::BuildingPressed()
 
 void AMinecraftCharacter::Slot1()
 {
-
+	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
+	{
+		PlayerCon->SwitchBlockType(0);
+	}
 }
 
 void AMinecraftCharacter::Slot2()
 {
-
+	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
+	{
+		PlayerCon->SwitchBlockType(1);
+	}
 }
 
 void AMinecraftCharacter::Slot3()
 {
-
+	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
+	{
+		PlayerCon->SwitchBlockType(2);
+	}
 }
 
 void AMinecraftCharacter::Slot4()
 {
-
+	if (AMCPlayerController* PlayerCon = Cast<AMCPlayerController>(Controller))
+	{
+		PlayerCon->SwitchBlockType(3);
+	}
 }
 
 void AMinecraftCharacter::MoveForward(float Value)

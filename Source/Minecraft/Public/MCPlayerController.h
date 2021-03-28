@@ -116,6 +116,9 @@ public:
 	bool CanDig() const;
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Player")
+	FORCEINLINE int32 GetActiveBlockIndex() const {return ActiveSlotIndex;};
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Player")
 	FORCEINLINE bool CanBuild() const { return PlayerAction == EPlayerAction::EPA_Building; };
 
 	FORCEINLINE TArray<FVector> GetDeletedBlocksLocations() const { return DeletedCubesLocations;};
@@ -126,6 +129,8 @@ public:
 	void BuildingStarted();
 	void BuildingStopped();
 	void BuildingPressed();
+
+	void SwitchBlockType(int32 NewIndex);
 
 #pragma endregion PUBLIC_FUNCTIONS
 
@@ -209,7 +214,7 @@ protected:
 	TArray<FVector> PlayerSpawnedCubesLocations;
 
 	int32 ActiveSlotIndex;
-	bool bBuildingPressed;
+	bool bBuildingAllowed;
 
 #pragma endregion PROTECTED_VARIABLES
 };

@@ -103,14 +103,17 @@ void AMCWorldChunk::PostActorCreated()
 	}
 }
 
-void AMCWorldChunk::ForceNewInstance(FVector SpawnLoc, UInstancedStaticMeshComponent* SpawnISMC)
+void AMCWorldChunk::ForceNewInstance(FVector SpawnLoc, int32 BlockIndex)
 {
-	if (SpawnISMC == nullptr) return;
+	if (BlockIndex >= MaterialsMapping.Num() || BlockIndex < 0) return; // invalid index
+	if (InstancedBoxes[BlockIndex] == nullptr) return;					// invalid index
 	FTransform SpawnTransform = FTransform(FRotator(0), SpawnLoc, FVector(1));
+
+	InstancedBoxes[BlockIndex]->AddInstance(SpawnTransform);
 
 	// TODO
 	// Find material by index mapping and select right ISMC
-	SpawnISMC->AddInstance(SpawnTransform);
+	// SpawnISMC->AddInstance(SpawnTransform);
 }
 
 void AMCWorldChunk::BeginPlay()
