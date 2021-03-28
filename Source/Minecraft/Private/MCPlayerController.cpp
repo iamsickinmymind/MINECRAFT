@@ -7,11 +7,12 @@
 #include "MCWorldChunk.h"
 #include <MCSaveGame.h>
 #include <Blueprint/UserWidget.h>
-
 #ifdef WITH_EDITOR
 #include "DrawDebugHelpers.h"
 #endif WITH_EDITOR
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Particles/ParticleSystemComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 AMCPlayerController::AMCPlayerController()
 {
@@ -144,6 +145,8 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 									LastHitBox = FBox();
 									HitCounter = 0;
 
+
+
 									// Save game after deleting a cube.
 									// Too heavy let them do it manually
 									// SaveGame();
@@ -156,6 +159,15 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 									}
 									*/
 								}
+							}
+
+							if (DiggingParticle)
+							{
+								FTransform EmitterSpawnTransform;
+									EmitterSpawnTransform.SetLocation(HitResult.ImpactNormal);
+									EmitterSpawnTransform.SetScale3D(FVector(1));
+
+								UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DiggingParticle, EmitterSpawnTransform, true);
 							}
 						}
 						else
@@ -367,6 +379,11 @@ void AMCPlayerController::RemoveHUD()
 	bShowMouseCursor = false;
 
 	SetInputMode(NewInputMode);
+}
+
+void AMCPlayerController::Dig()
+{
+
 }
 
 FVector2D AMCPlayerController::GetPlayerChunk() const
