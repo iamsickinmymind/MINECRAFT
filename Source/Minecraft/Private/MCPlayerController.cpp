@@ -46,6 +46,7 @@ AMCPlayerController::AMCPlayerController()
 	DiggingDifficulty.Add(Dirt, 3);
 
 	ActiveSlotIndex = 0;
+	ParticleScale = 2;
 }
 
 void AMCPlayerController::BeginPlay()
@@ -164,8 +165,8 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 							if (DiggingParticle)
 							{
 								FTransform EmitterSpawnTransform;
-									EmitterSpawnTransform.SetLocation(HitResult.ImpactNormal);
-									EmitterSpawnTransform.SetScale3D(FVector(1));
+									EmitterSpawnTransform.SetLocation(HitResult.Location);
+									EmitterSpawnTransform.SetScale3D(FVector(ParticleScale));
 
 								UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DiggingParticle, EmitterSpawnTransform, true);
 							}

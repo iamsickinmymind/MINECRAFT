@@ -216,6 +216,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player|Interaction")
 	class UParticleSystem* DiggingParticle = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Player|Interaction", meta = (UIMin = 0, ClampMin = 0))
+	int32 ParticleScale;
+
 	TWeakObjectPtr<class UPhysicalMaterial> LastHitPhysMat = nullptr;
 	FBox LastHitBox;
 	int32 HitCounter;
