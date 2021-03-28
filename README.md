@@ -9,7 +9,7 @@ All videos are recorded on laptop with following specs:
 - GTX 1650Ti
 
 
-[VIDEO LINK](https://vimeo.com/showcase/8297492)
+- [VIDEO LINK](https://vimeo.com/showcase/8297492)
 
 ## Timestamp
 - Started on Friday roughly at 19:00 CET
