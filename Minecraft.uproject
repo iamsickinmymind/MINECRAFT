@@ -13,5 +13,10 @@
 			]
 		}
 	],
-	"Plugins": []
+	"Plugins": [
+		{
+			"Name": "HoudiniEngine",
+			"Enabled": false
+		}
+	]
 }
