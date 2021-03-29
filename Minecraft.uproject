@@ -13,10 +13,12 @@
 			]
 		}
 	],
-	"Plugins": [
-		{
-			"Name": "HoudiniEngine",
-			"Enabled": false
-		}
+	"TargetPlatforms": [
+		"AllDesktop",
+		"IOS",
+		"LinuxNoEditor",
+		"LinuxAArch64NoEditor",
+		"MacNoEditor",
+		"WindowsNoEditor"
 	]
 }
