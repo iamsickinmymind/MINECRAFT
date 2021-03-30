@@ -171,7 +171,7 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "User Interface")
 	void RemoveHUD();
 
-	void Dig();
+	void Dig(FHitResult &HitResult);
 
 #pragma endregion PROTECTED_FUNCTIONS
 

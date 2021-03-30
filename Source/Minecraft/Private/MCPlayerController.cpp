@@ -318,6 +318,8 @@ bool AMCPlayerController::LoadGame()
 		TArray<FVector> TempDeletedBlocksLocations;
 		TMap<FVector, int32> TempPlayerSpawnedCubesLocations;
 
+		// Do I really need to store SpawnedChunksRefs?
+		// I could spawn Chunks with SpawnedChunksLocations and then map the array to match
 		if( NewLoadGame->GetSaveData(TempSpawnedChunksRefs, TempSpawnedChunksCoords, TmpSpawnedChunksLocations, NewPlayerPosition, TempLastKnownPlayerChunkCoord, TempDeletedBlocksLocations, TempPlayerSpawnedCubesLocations))
 		{
 			// TODO: reload the world here
@@ -350,9 +352,14 @@ bool AMCPlayerController::LoadGame()
 			DeletedCubesLocations = TempDeletedBlocksLocations;
 			PlayerSpawnedCubesLocations = TempPlayerSpawnedCubesLocations;
 
-			for (int32 i = 0; i < SpawnedChunksRefs.Num(); i++)
+			// OPTIMISE
+			// This part could be replaced with SpawnChunks if PlayerPositin is set before
+			// this could optimise the code a lot and prevent some loading issues
+			// for (int32 i = 0; i < SpawnedChunksRefs.Num(); i++)
+			for (int32 i = 0; i < SpawnedChunksLocations.Num(); i++)
 			{
-				if (SpawnedChunksRefs[i])
+				// if (SpawnedChunksRefs[i])
+				if (SpawnedChunksLocations.IsValidIndex(i))
 				{
 					FRotator TempRot(0);
 					FActorSpawnParameters ChunkSpawnParams;
@@ -361,7 +368,6 @@ bool AMCPlayerController::LoadGame()
 				}
 			}
 
-			// SetActorLocation must be the last thing to do
 			GetPawn()->SetActorLocation(NewPlayerPosition);
 
 			return true;
@@ -382,9 +388,11 @@ void AMCPlayerController::RemoveHUD()
 	SetInputMode(NewInputMode);
 }
 
-void AMCPlayerController::Dig()
+void AMCPlayerController::Dig(FHitResult &HitResult)
 {
-
+	// TODO
+	// Use this function for digging
+	// pass FHitResult from Tick
 }
 
 FVector2D AMCPlayerController::GetPlayerChunk() const
@@ -582,6 +590,9 @@ void AMCPlayerController::DestroyChunks()
 				// TODO 
 				// use GetComponents instead for its new API implementation
 				// to remove instances call function on the Chunk itself
+
+				// OPTIMISE
+				// Crashing here after loading game, seems that array aint properly utilized
 				auto ChunkComponents = SpawnedChunksRefs[i]->GetComponentsByClass(UInstancedStaticMeshComponent::StaticClass());
 				for (auto Itr : ChunkComponents)
 				{
