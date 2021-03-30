@@ -171,6 +171,8 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "User Interface")
 	void RemoveHUD();
 
+	void Dig();
+
 #pragma endregion PROTECTED_FUNCTIONS
 
 #pragma region PROTECTED_VARIABLES
@@ -180,6 +182,8 @@ protected:
 	TArray<FIntVector> SpawnedChunksCoords;
 	TArray<FVector> SpawnedChunksLocations;
 	FIntVector ChunkCoords;
+
+	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HUD")
 	TSubclassOf<class UUserWidget> MainMenuClass;
@@ -208,6 +212,12 @@ protected:
 	/** For each PhysicalMaterial define how many times player need to hit the Cube. If not defined default is 0; */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="Player|Interaction")
 	TMap<FString, int32> DiggingDifficulty;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player|Interaction")
+	class UParticleSystem* DiggingParticle = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player|Interaction", meta = (UIMin = 0, ClampMin = 0))
+	int32 ParticleScale;
 
 	TWeakObjectPtr<class UPhysicalMaterial> LastHitPhysMat = nullptr;
 	FBox LastHitBox;
