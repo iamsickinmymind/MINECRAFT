@@ -13,6 +13,8 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Particles/ParticleSystemComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include <Engine/TriggerBox.h>
+#include <../MinecraftCharacter.h>
 
 AMCPlayerController::AMCPlayerController()
 {
@@ -204,20 +206,54 @@ void AMCPlayerController::Tick(float DeltaSeconds)
 							// this is too complicated maybe I should approach building the same way I do digging using timers
 						if (AMCWorldChunk* HitChunk = Cast<AMCWorldChunk>(HitResult.Actor))
 						{
+							// TODO
+							// Check if the player aint colliding with this block
+							// Spawn FBox and check if overlapping actor == GetPawn()
+							FActorSpawnParameters PlayerCollisionTestSpawnParams;
+								PlayerCollisionTestSpawnParams.bNoFail = true;
+								PlayerCollisionTestSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-							HitChunk->ForceNewInstance(SpawnInstanceLocation, ActiveSlotIndex);
-							PlayerSpawnedCubesLocations.Add(SpawnInstanceLocation, ActiveSlotIndex);
-							// This logic is deprecated since I pass only index to find mapping material
-							/*
-							if (UInstancedStaticMeshComponent* HitComp = Cast<UInstancedStaticMeshComponent>(HitResult.GetComponent()))
+							ATriggerBox* PlayerCollisionTest = GetWorld()->SpawnActor<ATriggerBox>(ATriggerBox::StaticClass(), SpawnInstanceLocation, FRotator(0), PlayerCollisionTestSpawnParams);
+							bool bOverlappingPlayer = false;
+
+							if (PlayerCollisionTest)
+							{
+								TArray<AActor*> CollidingActors;
+								PlayerCollisionTest->GetOverlappingActors(CollidingActors);
+								if (CollidingActors.Num() > 0)
+								{
+									for (auto ActorItr : CollidingActors)
+									{
+										AMinecraftCharacter* CastedPlayerChar = Cast<AMinecraftCharacter>(ActorItr);
+										if(CastedPlayerChar)
+										{
+											bOverlappingPlayer = true;
+											break;
+										}
+									}
+								}
+							}
+
+							if (!bOverlappingPlayer)
 							{
 								HitChunk->ForceNewInstance(SpawnInstanceLocation, ActiveSlotIndex);
+								PlayerSpawnedCubesLocations.Add(SpawnInstanceLocation, ActiveSlotIndex);
+								// This logic is deprecated since I pass only index to find mapping material
+								/*
+								if (UInstancedStaticMeshComponent* HitComp = Cast<UInstancedStaticMeshComponent>(HitResult.GetComponent()))
+								{
+									HitChunk->ForceNewInstance(SpawnInstanceLocation, ActiveSlotIndex);
+								}
+								*/
 							}
-							*/
+
+							//Cleanup
+							PlayerCollisionTest->Destroy();
 						}
 
 						// Disable building allowed to force player to click again
 						bBuildingAllowed = false;
+						UE_LOG(LogTemp, Warning, TEXT("BuildingDisabled"))
 					}
 				}
 			}
@@ -470,9 +506,8 @@ void AMCPlayerController::BuildingPressed()
 	if (CanBuild())
 	{
 		bBuildingAllowed = true;
+		UE_LOG(LogTemp, Warning, TEXT("BuildingAllowed"))
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("BuildingAllowed: %d"), bBuildingAllowed)
 }
 
 void AMCPlayerController::SwitchBlockType(int32 NewIndex)

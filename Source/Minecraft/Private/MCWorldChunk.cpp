@@ -113,6 +113,9 @@ void AMCWorldChunk::ForceNewInstance(FVector SpawnLoc, int32 BlockIndex)
 	if (InstancedBoxes[BlockIndex] == nullptr) return;					// invalid index
 	FTransform SpawnTransform = FTransform(FRotator(0), SpawnLoc, FVector(1));
 
+	// TODO
+	// Calculate relative tranform?
+	// https://docs.unrealengine.com/en-US/API/Runtime/Engine/Components/USceneComponent/CalcNewComponentToWorld/index.html
 	InstancedBoxes[BlockIndex]->AddInstance(SpawnTransform);
 
 	// TODO
