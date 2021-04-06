@@ -6,6 +6,14 @@
 #include <SimplexNoiseBPLibrary.h>
 #include <MCPlayerController.h> //OPTIMISE <--------- I dont like this circular deendency
 
+// TODO
+/*
+WORLD transform to Relative transform for each newly spawned OR destroyed block
+1) Do a "Compose Transform" (that is what it is called in Blueprint) - note order of transforms matters: FTransform NewTransform = RelativeTransform * ParentTransform
+
+2) Get the location from the NewTransform: FVector NewLocation = NewTransform.GetLocation()
+*/
+
 // Sets default values
 AMCWorldChunk::AMCWorldChunk()
 {
@@ -28,7 +36,6 @@ AMCWorldChunk::AMCWorldChunk()
 
 	for (int32 i = 0; i < (MaterialsMapping.Num()); i++)
 	{
-
 		UInstancedStaticMeshComponent* NewComp = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName(FString("instancedMesh").Append(FString::FormatAsNumber(i))));
 		if (NewComp)
 		{
